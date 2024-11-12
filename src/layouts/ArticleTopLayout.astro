@@ -3,15 +3,23 @@ import type { CollectionEntry } from "astro:content"
 import { formatDate, readingTime } from "@lib/utils"
 
 type Props = {
-  entry: CollectionEntry<"projects"> | CollectionEntry<"blog">
+  entry: CollectionEntry<"projects"> | CollectionEntry<"blog"> | CollectionEntry<"publications">
 }
+
+const allowedCollections = ["projects", "publications"];
 
 const { entry } = Astro.props
 const { collection, data, body } = entry
 const { title, summary, date } = data
 
-const demoUrl = collection === "projects" ? data.demoUrl : null
-const repoUrl = collection === "projects" ? data.repoUrl : null
+// Handle different URL types for different collections
+const demoUrl = allowedCollections.includes(collection) ? data.demoUrl : null;
+const repoUrl = collection === "projects" ? data.repoUrl : null;
+const publicationUrl = collection === "publications" ? data.publicationUrl : null;
+const arxivUrl = collection === "publications" ? data.arxivUrl : null;
+const zenodoUrl = collection === "publications" ? data.zenodoUrl : null;
+const githubUrl = collection === "publications" ? data.githubUrl : null;
+const xUrl = collection === "publications" ? data.xUrl : null;
 ---
 
 <div>
@@ -44,28 +52,78 @@ const repoUrl = collection === "projects" ? data.repoUrl : null
   <div class="mt-1">
     {summary}
   </div>
-  {(demoUrl || repoUrl) && 
-  <div class="mt-4 flex flex-wrap gap-2">
-    {demoUrl && 
-      <a href={demoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
-        <svg class="size-4">
-          <use href="/ui.svg#globe" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
-        </svg>
-        <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
-          See Demo
-        </span>
-      </a>
-    }
-    {repoUrl && 
-      <a href={repoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
-        <svg class="size-4">
-          <use href="/ui.svg#link" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
-        </svg>
-        <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
-          See Repository
-        </span>
-      </a>
-    }
-  </div> 
+  {(demoUrl || repoUrl || publicationUrl || arxivUrl || zenodoUrl || githubUrl || xUrl) && 
+    <div class="mt-4 flex flex-wrap gap-2">
+      {demoUrl && 
+        <a href={demoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#globe" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Demo
+          </span>
+        </a>
+      }
+      {repoUrl && 
+        <a href={repoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#git-branch" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Repository
+          </span>
+        </a>
+      }
+      {publicationUrl && 
+        <a href={publicationUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#document" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Publication
+          </span>
+        </a>
+      }
+      {arxivUrl && 
+        <a href={arxivUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-8">
+            <use href="/ui.svg#archive" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Preprint
+          </span>
+        </a>
+      }
+      {zenodoUrl && 
+        <a href={zenodoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-8">
+            <use href="/ui.svg#zenodo" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Zenodo
+          </span>
+        </a>
+      }
+      {githubUrl && 
+        <a href={githubUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/social.svg#github" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            GitHub
+          </span>
+        </a>
+      }
+      {xUrl && 
+        <a href={xUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/social.svg#twitter-x" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Twitter
+          </span>
+        </a>
+      }
+    </div>
   }
 </div>

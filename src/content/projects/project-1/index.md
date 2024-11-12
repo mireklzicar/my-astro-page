@@ -1,7 +1,7 @@
 ---
 title: "Project One"
 summary: "Lorem ipsum dolor sit amet"
-date: "Mar 18 2022"
+date: "Nov 18 2022"
 draft: false
 tags:
 - Astro

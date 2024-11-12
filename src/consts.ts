@@ -2,9 +2,9 @@ import type { Site, Page, Links, Socials } from "@types"
 
 // Global
 export const SITE: Site = {
-  TITLE: "Astro Sphere",
-  DESCRIPTION: "Welcome to Astro Sphere, a portfolio and blog for designers and developers.",
-  AUTHOR: "Mark Horn",
+  TITLE: "Miroslav Lžičař",
+  DESCRIPTION: "Welcome to personal website of Miroslav Lzicar – CTO and Co-Founder of Deep MedChem.",
+  AUTHOR: "Miroslav Lzicar",
 }
 
 // Work Page
@@ -18,6 +18,12 @@ export const BLOG: Page = {
   TITLE: "Blog",
   DESCRIPTION: "Writing on topics I am passionate about.",
 }
+
+export const PUBLICATIONS: Page = {
+  TITLE: "Publications",
+  DESCRIPTION: "Recent publications I have worked on.",
+}
+
 
 // Projects Page 
 export const PROJECTS: Page = {
@@ -37,13 +43,17 @@ export const LINKS: Links = [
     TEXT: "Home", 
     HREF: "/", 
   },
-  { 
-    TEXT: "Work", 
-    HREF: "/work", 
-  },
+  // { 
+  //   TEXT: "Work", 
+  //   HREF: "/work", 
+  // },
   { 
     TEXT: "Blog", 
     HREF: "/blog", 
+  },
+  { 
+    TEXT: "Publications", 
+    HREF: "/publications", 
   },
   { 
     TEXT: "Projects", 
@@ -56,26 +66,32 @@ export const SOCIALS: Socials = [
   { 
     NAME: "Email",
     ICON: "email", 
-    TEXT: "markhorn.dev@gmail.com",
-    HREF: "mailto:markhorn.dev@gmail.com",
+    TEXT: "mireklzicar seznam cz",
+    HREF: "mailto:mireklzicar@seznam.cz",
   },
   { 
     NAME: "Github",
     ICON: "github",
-    TEXT: "markhorn-dev",
-    HREF: "https://github.com/markhorn-dev/astro-sphere"
+    TEXT: "mireklzicar",
+    HREF: "https://github.com/mireklzicar"
   },
   { 
     NAME: "LinkedIn",
     ICON: "linkedin",
-    TEXT: "markhorn-dev",
-    HREF: "https://www.linkedin.com/in/markhorn-dev/",
+    TEXT: "miroslavlzicar",
+    HREF: "https://www.linkedin.com/in/miroslavlzicar/",
   },
   { 
     NAME: "Twitter",
     ICON: "twitter-x",
-    TEXT: "markhorn_dev",
-    HREF: "https://twitter.com/markhorn_dev",
+    TEXT: "miroslavlzicar",
+    HREF: "https://twitter.com/miroslavlzicar",
+  },
+  { 
+    NAME: "Orcid",
+    ICON: "orcid",
+    TEXT: "0000-0003-3192-8007",
+    HREF: "http://orcid.org/0000-0003-3192-8007",
   },
 ]
 

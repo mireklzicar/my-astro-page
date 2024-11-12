@@ -17,6 +17,11 @@ const projects = (await getCollection("projects"))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0,3)
 
+const publications = (await getCollection("publications"))
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0,3)
+
 const stack = [
   { 
     text: "Astro", 
@@ -83,10 +88,10 @@ const stack = [
             Hello, I am ...
           </p>
           <p class='animated text-2xl md:text-3xl lg:text-4xl font-bold uppercase text-black dark:text-white'>
-            Astro Sphere
+            Miroslav Lzicar
           </p>
           <p class='animated text-sm md:text-base lg:text-lg opacity-75'>
-            Currently designing products for humans.
+            Currently CTO @ <a href="https://deepmedchem.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-100 transition-opacity">Deep MedChem</a>
           </p>
           <div id="ctaButtons" class='animated flex flex-wrap gap-4 justify-center mt-5'>
             <a href='/blog' class='py-2 px-4 rounded truncate text-xs md:text-sm lg:text-base bg-black dark:bg-white text-white dark:text-black hover:opacity-75 blend'>
@@ -104,19 +109,52 @@ const stack = [
   <div class="relative bg-white dark:bg-black">
     <div class="mx-auto max-w-screen-sm p-5 space-y-24 pb-16">
 
-      <!-- About Section -->
+
+  <!-- About Section -->
+  <section class="animate py-16">
+    <article class="max-w-prose mx-auto px-4">
+      <div class="mb-8">
+        <p class="text-lg leading-relaxed">
+          Currently serving as the <span class="font-semibold">CTO of Deep MedChem</span>, I lead initiatives to revolutionize in-silico drug discovery through innovative AI solutions. Previously, I worked as a <span class="font-semibold">Machine Learning Researcher</span> at MAMA AI and as a <span class="font-semibold">Fullstack Software Engineer</span> at Charles University.
+        </p>
+      </div>
+
+      <div>
+        <p class="leading-relaxed">
+          My academic background includes incomplete studies in Bioinformatics and Philosophy, bringing a unique interdisciplinary perspective to my technical work. I particularly enjoy exploring novel applications in AI/ML, having conducted various research projects as a scientific programmer. I am driven by challenging projects that require creative problem-solving and pushing technical boundaries.
+        </p>
+      </div>
+    </article>
+  </section>
+
+
+
+      <!-- Publications Preview Section -->
       <section class="animate">
-        <article>
-          <p>I am a <b><i>software engineer</i></b>, <b><i>ui/ux designer</i></b>, <b><i>product planner</i></b>, <b><i>mentor</i></b>, <b><i>student</i></b>, <b><i>minimalist</i></b>, <b><i>eternal optimist</i></b>, <b><i>crypto enthusiast</i></b> and <b><i>sarcasm connoisseur</i></b>.</p>
-          <p>I love to both build and break things. I am motivated by challenging projects with self-guided research and dynamic problem solving. My true passion is crafting creative front end designs with unique takes on color, typography and motion.</p>
-          <p>During my career</p>
-          <p>I have built products ranging from marketing and ecommerce websites to complex enterprise apps with focus on delivering fast, elegant code along with delightful user interfaces.</p>
-          <p>Now</p>
-          <p>I currently work as a software engineer at StreamlineFS, where I do product planning, design and development.</p>
-        </article>
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent publications
+            </p>
+            <a href="/publications" class="w-fit col-span-3 group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All publications
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {publications.map((publication) => (
+              <li>
+                <ArrowCard entry={publication} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
-      <!-- Blog Preview Section -->
+      <!-- Blog Preview Section 
+
+      
       <section class="animate">
         <div class="space-y-4">
           <div class="flex justify-between">
@@ -139,31 +177,6 @@ const stack = [
         </div>
       </section>
 
-      <!-- Tech Stack Section -->
-      <section class="animate">
-        <div class="space-y-4">
-          <p class="font-semibold text-black dark:text-white">
-            Website build with
-          </p>
-          <div class="flex flex-wrap items-center gap-2 mt-5">
-            {stack.map(item => (
-              <StackCard 
-                text={item.text}
-                icon={item.icon}
-                href={item.href}
-              />
-            ))}
-          </div>
-          <div>
-            Performing reactivity and statefulness, special guest
-            <a href="https://www.solidjs.com/" target="_blank" class="w-fit group underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
-              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
-                SolidJS
-              </span>
-            </a>
-          </div>
-        </div>
-      </section>
 
       <!-- Project Preview Section -->
       <section class="animate">
@@ -188,7 +201,8 @@ const stack = [
         </div>
       </section>
 
-      <!-- Contact Section -->
+  
+        <!-- Contact Section -->
       <section class="animate">
         <div>
           <p class="font-semibold text-black dark:text-white">
@@ -214,6 +228,25 @@ const stack = [
             ))}
         </div>
       </section>
+  
+      <!-- Tech Stack Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <p class="font-semibold text-black dark:text-white">
+            Website build with
+          </p>
+          <div class="flex flex-wrap items-center gap-2 mt-5">
+            {stack.map(item => (
+              <StackCard 
+                text={item.text}
+                icon={item.icon}
+                href={item.href}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 </PageLayout>
