@@ -12,4 +12,4 @@ thumbnail: petersen.gif
 repoUrl: https://github.com/mireklzicar/Spanning-trees-search
 ---
 
-![](petersen.gif)
+![img](petersen.gif)
