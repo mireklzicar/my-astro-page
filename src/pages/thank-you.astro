@@ -1,0 +1,27 @@
+---
+import PageLayout from "@layouts/PageLayout.astro"
+
+const title = "Thank You"
+const description = "Thank you for your message"
+---
+
+<PageLayout title={title} description={description}>
+  <div class="relative bg-white dark:bg-black min-h-screen">
+    <div class="mx-auto max-w-screen-sm p-5">
+      <section class="animate py-16 text-center">
+        <h1 class="text-3xl font-bold mb-4 text-black dark:text-white">
+          Thank You!
+        </h1>
+        <p class="mb-8 text-black/75 dark:text-white/75">
+          Your message has been sent successfully. I'll get back to you as soon as possible.
+        </p>
+        <a 
+          href="/"
+          class="inline-block py-2 px-4 rounded bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
+        >
+          Return Home
+        </a>
+      </section>
+    </div>
+  </div>
+</PageLayout>

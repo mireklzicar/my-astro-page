@@ -8,6 +8,7 @@ const publications = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()),
     draft: z.boolean().optional(),
+    thumbnail: z.string().optional(),
     demoUrl: z.string().optional(),
     publicationUrl: z.string().optional(),
     arxivUrl: z.string().optional(),
@@ -24,6 +25,7 @@ const work = defineCollection({
     role: z.string(),
     dateStart: z.coerce.date(),
     dateEnd: z.union([z.coerce.date(), z.string()]),
+    thumbnail: z.string().optional(),
   }),
 })
 
@@ -35,6 +37,7 @@ const blog = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()),
     draft: z.boolean().optional(),
+    thumbnail: z.string().optional(),
   }),
 })
 
@@ -48,6 +51,7 @@ const projects = defineCollection({
     draft: z.boolean().optional(),
     demoUrl: z.string().optional(),
     repoUrl: z.string().optional(),
+    thumbnail: z.string().optional(),
   }),
 })
 
