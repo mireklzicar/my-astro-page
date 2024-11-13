@@ -5,9 +5,8 @@ import tailwind from "@astrojs/tailwind";
 import solidJs from "@astrojs/solid-js";
 import partytown from "@astrojs/partytown";
 
-// Set base path for GitHub Pages, adjust if running locally
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
-const base = isGitHubPages ? '/my-astro-page' : '/';
+const base = isGitHubPages ? '/my-astro-page' : '';
 
 export default defineConfig({
   site: "https://mireklzicar.com",
@@ -19,4 +18,9 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
     partytown({ config: { forward: ["dataLayer.push"] } }),
   ],
+  vite: {
+    define: {
+      'import.meta.env.BASE_PATH': JSON.stringify(base),
+    },
+  },
 });
