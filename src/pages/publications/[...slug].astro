@@ -8,16 +8,19 @@ import ArticleBottomLayout from "@layouts/ArticleBottomLayout.astro"
 
 // Create the static publications pages
 export async function getStaticPaths() {
-	const publications = await getCollection("publications")
-	return publications.map((publication) => ({
-		params: { slug: publication.slug },
-		props: publication,
-	}))
+    const publications = await getCollection("publications")
+    return publications.map((publication) => ({
+        params: { slug: publication.slug },
+        props: { entry: publication }, // Change this line to pass entry explicitly
+    }))
 }
 
 // Get the requested publication
-type Props = CollectionEntry<"publications">
-const publication: CollectionEntry<'publications'> = Astro.props.entry;
+interface Props {
+    entry: CollectionEntry<"publications">
+}
+
+const { entry: publication } = Astro.props;
 const { title, summary } = publication.data
 ---
 

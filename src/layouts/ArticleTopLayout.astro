@@ -1,19 +1,23 @@
 ---
-import type { CollectionEntry } from "astro:content"
-import { formatDate, readingTime } from "@lib/utils"
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, readingTime } from '../lib/utils';
 
-type Props = {
-  entry: CollectionEntry<"projects"> | CollectionEntry<"blog"> | CollectionEntry<"publications">
+interface Props {
+  entry: CollectionEntry<'blog' | 'projects' | 'publications'>;
 }
 
-const allowedCollections = ["projects", "publications"];
+const { entry } = Astro.props;
+const { data, collection, body } = entry;
+const { title, summary, date } = data;
+const allowedCollections = ['projects', 'publications'] as const;
 
-const { entry } = Astro.props
-const { collection, data, body } = entry
-const { title, summary, date } = data
+// Type guard function
+const hasDemoUrl = (data: any): data is { demoUrl?: string } => {
+  return 'demoUrl' in data;
+};
 
 // Handle different URL types for different collections
-const demoUrl = allowedCollections.includes(collection) ? data.demoUrl : null;
+const demoUrl = allowedCollections.includes(collection as any) && hasDemoUrl(data) ? data.demoUrl : null;
 const repoUrl = collection === "projects" ? data.repoUrl : null;
 const publicationUrl = collection === "publications" ? data.publicationUrl : null;
 const arxivUrl = collection === "publications" ? data.arxivUrl : null;
