@@ -37,6 +37,9 @@ jobs:
         run: npm run build
         env:
           CI: true
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_PAGES: true  # Set this to indicate a GitHub Pages build
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
