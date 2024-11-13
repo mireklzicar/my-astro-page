@@ -6,30 +6,11 @@ type Props = {
   pill?: boolean
 }
 
-function getThumbnailPath(entry: Props['entry']) {
-  // Return early if no thumbnail
-  if (!entry.data.thumbnail) {
-    return null;
-  }
-  
-  // Remove any leading or trailing slashes
-  const thumbnailPath = entry.data.thumbnail.replace(/^\/|\/$/g, '');
-  
-  // Get the base path from environment or default to '.'
-  const basePath = import.meta.env.BASE_URL?.replace(/\/$/, '') || '.';
-  
-  // For local development, use a relative path
-  if (import.meta.env.DEV) {
-    return `./src/content/${entry.collection}/${entry.slug}/${thumbnailPath}`;
-  }
-  
-  // For production, use the base-relative path
-  return `${basePath}/content/${entry.collection}/${entry.slug}/${thumbnailPath}`;
-}
-
-
-
 export default function ArrowCard({ entry, pill }: Props) {
+  // Construct the image path directly with proper type checking
+  const imagePath = entry.data.thumbnail ? 
+    `/src/content/${entry.collection}/${entry.slug}/${entry.data.thumbnail}` : undefined;
+
   return (
     <a 
       href={`/${entry.collection}/${entry.slug}`} 
@@ -82,8 +63,10 @@ export default function ArrowCard({ entry, pill }: Props) {
       {entry.data.thumbnail && (
         <div class="mt-4 w-full aspect-[2/1] overflow-hidden rounded-md">
           <img 
-            src={getThumbnailPath(entry)}
+            src={imagePath}
             alt={`Thumbnail for ${entry.data.title}`}
+            width={800}
+            height={400}
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300 ease-in-out"
             loading="lazy"
           />
@@ -91,7 +74,7 @@ export default function ArrowCard({ entry, pill }: Props) {
       )}
 
       <ul class="flex flex-wrap mt-4 gap-1.5">
-        {entry.data.tags.map((tag: string, index: number) => (
+        {entry.data.tags.map((tag: string) => (
           <li class="text-xs uppercase py-0.5 px-2 rounded bg-black/5 dark:bg-white/20 text-black/75 dark:text-white/75">
             {tag}
           </li>

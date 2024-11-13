@@ -15,4 +15,9 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
     partytown({ config: { forward: ["dataLayer.push"] } }),
   ],
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    },
+  },
 });
