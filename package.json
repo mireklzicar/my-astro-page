@@ -2,6 +2,10 @@
   "name": "astro-sphere",
   "type": "module",
   "version": "1.0.0",
+  "engines": {
+    "node": ">=22.7.0",
+    "npm": ">=10.8.2"
+  },
   "scripts": {
     "dev": "astro dev",
     "dev:network": "astro dev --host",
