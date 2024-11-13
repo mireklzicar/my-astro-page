@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 
 // Get the requested publication
 type Props = CollectionEntry<"publications">
-const publication = Astro.props
+const publication: CollectionEntry<'publications'> = Astro.props.entry;
 const { title, summary } = publication.data
 ---
 
