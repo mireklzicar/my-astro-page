@@ -7,7 +7,7 @@ type Props = {
 }
 
 function getThumbnailPath(entry: Props['entry']) {
-  const basePath = import.meta.env.BASE_PATH || './src/content';
+  const basePath = import.meta.env.BASE_PATH;
   return `${basePath}/${entry.collection}/${entry.slug}/${entry.data.thumbnail}`;
 }
 
