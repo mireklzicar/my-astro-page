@@ -11,6 +11,7 @@
     "dev:network": "astro dev --host",
     "start": "astro dev",
     "build": "astro build",
+    "build:github": "astro build --base=.",
     "preview": "astro preview",
     "preview:network": "astro dev --host",
     "astro": "astro",

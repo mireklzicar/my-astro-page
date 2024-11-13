@@ -7,9 +7,27 @@ type Props = {
 }
 
 function getThumbnailPath(entry: Props['entry']) {
-  const basePath = import.meta.env.BASE_PATH;
-  return `${basePath}/${entry.collection}/${entry.slug}/${entry.data.thumbnail}`;
+  // Return early if no thumbnail
+  if (!entry.data.thumbnail) {
+    return null;
+  }
+  
+  // Remove any leading or trailing slashes
+  const thumbnailPath = entry.data.thumbnail.replace(/^\/|\/$/g, '');
+  
+  // Get the base path from environment or default to '.'
+  const basePath = import.meta.env.BASE_URL?.replace(/\/$/, '') || '.';
+  
+  // For local development, use a relative path
+  if (import.meta.env.DEV) {
+    return `./src/content/${entry.collection}/${entry.slug}/${thumbnailPath}`;
+  }
+  
+  // For production, use the base-relative path
+  return `${basePath}/content/${entry.collection}/${entry.slug}/${thumbnailPath}`;
 }
+
+
 
 export default function ArrowCard({ entry, pill }: Props) {
   return (

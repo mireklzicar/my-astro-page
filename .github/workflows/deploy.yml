@@ -32,6 +32,10 @@ jobs:
           
       - name: Install dependencies
         run: npm clean-install
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
         
       - name: Build
         run: npm run build
@@ -39,10 +43,8 @@ jobs:
           CI: true
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_PAGES: true  # Set this to indicate a GitHub Pages build
-          
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
+          GITHUB_PAGES: true
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
