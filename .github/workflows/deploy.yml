@@ -33,6 +33,12 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
+              # Add this step before build
+      - name: Prepare public directory
+        run: |
+            mkdir -p public
+            node scripts/copy-images.js
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

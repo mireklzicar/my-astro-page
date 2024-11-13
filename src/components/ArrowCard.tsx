@@ -1,5 +1,6 @@
 import { formatDate } from "@lib/utils"
 import type { CollectionEntry } from "astro:content"
+import type { ImageMetadata } from 'astro'
 
 type Props = {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects"> | CollectionEntry<"publications">
@@ -7,9 +8,14 @@ type Props = {
 }
 
 export default function ArrowCard({ entry, pill }: Props) {
-  // Construct the image path directly with proper type checking
-  const imagePath = entry.data.thumbnail ? 
-    `/src/content/${entry.collection}/${entry.slug}/${entry.data.thumbnail}` : undefined;
+  // Construct the image path based on environment
+  const getImagePath = (thumbnail: string) => {
+    if (import.meta.env.DEV) {
+      return `/src/content/${entry.collection}/${entry.slug}/${thumbnail}`;
+    }
+    // For production, use the path where images will be copied during build
+    return `/content/${entry.collection}/${entry.slug}/${thumbnail}`;
+  };
 
   return (
     <a 
@@ -63,7 +69,7 @@ export default function ArrowCard({ entry, pill }: Props) {
       {entry.data.thumbnail && (
         <div class="mt-4 w-full aspect-[2/1] overflow-hidden rounded-md">
           <img 
-            src={imagePath}
+            src={getImagePath(entry.data.thumbnail)}
             alt={`Thumbnail for ${entry.data.title}`}
             width={800}
             height={400}

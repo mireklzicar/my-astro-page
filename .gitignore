@@ -1,6 +1,8 @@
 # build output
 dist/
 
+public/content/*
+
 # generated types
 .astro/
 
