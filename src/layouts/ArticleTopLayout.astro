@@ -3,17 +3,21 @@ import type { CollectionEntry } from 'astro:content';
 import { formatDate, readingTime } from '../lib/utils';
 
 interface Props {
-  entry: CollectionEntry<'blog' | 'projects' | 'publications'>;
+  entry: CollectionEntry<'blog' | 'projects' | 'publications' | 'talks'>;
 }
 
 const { entry } = Astro.props;
 const { data, collection, body } = entry;
 const { title, summary, date } = data;
-const allowedCollections = ['projects', 'publications'] as const;
+const allowedCollections = ['projects', 'publications', 'talks'] as const;
 
 // Type guard function
 const hasDemoUrl = (data: any): data is { demoUrl?: string } => {
   return 'demoUrl' in data;
+};
+
+const hasXUrl = (data: any): data is { xUrl?: string } => {
+  return 'xUrl' in data;
 };
 
 // Handle different URL types for different collections
@@ -23,7 +27,8 @@ const publicationUrl = collection === "publications" ? data.publicationUrl : nul
 const arxivUrl = collection === "publications" ? data.arxivUrl : null;
 const zenodoUrl = collection === "publications" ? data.zenodoUrl : null;
 const githubUrl = collection === "publications" ? data.githubUrl : null;
-const xUrl = collection === "publications" ? data.xUrl : null;
+const xUrl = allowedCollections.includes(collection as any) && hasXUrl(data) ? data.xUrl : null;
+const youtubeUrl = collection === "talks" ? data.youtubeUrl : null;
 ---
 
 <div>
@@ -56,7 +61,7 @@ const xUrl = collection === "publications" ? data.xUrl : null;
   <div class="mt-1">
     {summary}
   </div>
-  {(demoUrl || repoUrl || publicationUrl || arxivUrl || zenodoUrl || githubUrl || xUrl) && 
+  {(demoUrl || repoUrl || publicationUrl || arxivUrl || zenodoUrl || githubUrl || xUrl || youtubeUrl) && 
     <div class="mt-4 flex flex-wrap gap-2">
       {demoUrl && 
         <a href={demoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
@@ -125,6 +130,16 @@ const xUrl = collection === "publications" ? data.xUrl : null;
           </svg>
           <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
             Twitter
+          </span>
+        </a>
+      }
+      {youtubeUrl && 
+        <a href={youtubeUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/social.svg#youtube" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            YouTube
           </span>
         </a>
       }

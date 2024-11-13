@@ -18,6 +18,11 @@ const projects = (await getCollection("projects"))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0,3)
 
+const talks = (await getCollection("talks"))
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0,3)
+
 const publications = (await getCollection("publications"))
   .filter(project => !project.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
@@ -211,6 +216,31 @@ const stack = [
           </ul>
         </div>
       </section>
+
+
+      <!-- talks Preview Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent talks
+            </p>
+            <a href="/talks" class="w-fit col-span-3 group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All talks
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {talks.map((talk) => (
+              <li>
+                <ArrowCard entry={talk} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
 
   
       <!-- Contact Section 

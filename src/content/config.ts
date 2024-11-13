@@ -18,6 +18,21 @@ const publications = defineCollection({
   }),
 })
 
+const talks = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    summary: z.string(),
+    date: z.coerce.date(),
+    tags: z.array(z.string()),
+    draft: z.boolean().optional(),
+    thumbnail: z.string().optional(),
+    youtubeUrl: z.string().optional(),
+    xUrl: z.string().optional(),
+  }),
+})
+
+
 const work = defineCollection({
   type: "content",
   schema: z.object({
@@ -63,4 +78,4 @@ const legal = defineCollection({
   }),
 })
 
-export const collections = { publications, work, blog, projects, legal }
+export const collections = { publications, work, blog, projects, legal, talks }

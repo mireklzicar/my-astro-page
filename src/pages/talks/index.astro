@@ -1,0 +1,28 @@
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Talks from "@components/Talks"
+import { TALKS } from "@consts"
+
+const talks = (await getCollection("talks"))
+  .filter(talk => !talk.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const tags = [...new Set(talks.flatMap(talk => talk.data.tags))]
+  .sort((a, b) => a.localeCompare(b))
+---
+
+<PageLayout title={TALKS.TITLE} description={TALKS.DESCRIPTION}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {TALKS.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Talks client:load tags={tags} data={talks} />
+    </div>
+  </BottomLayout>
+</PageLayout>

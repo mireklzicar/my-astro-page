@@ -1,0 +1,38 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import ArticleTopLayout from "@layouts/ArticleTopLayout.astro"
+import ArticleBottomLayout from "@layouts/ArticleBottomLayout.astro"
+
+// Create the static talks pages
+export async function getStaticPaths() {
+    const talks = await getCollection("talks")
+    return talks.map((talk) => ({
+        params: { slug: talk.slug },
+        props: { entry: talk }, // Change this line to pass entry explicitly
+    }))
+}
+
+// Get the requested talk
+interface Props {
+    entry: CollectionEntry<"talks">
+}
+
+const { entry: talk } = Astro.props;
+const { title, summary } = talk.data
+---
+
+<PageLayout title={title} description={summary}>
+  <TopLayout>
+    <div class="animate">
+      <ArticleTopLayout entry={talk} />
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <ArticleBottomLayout entry={talk} />
+    </div>
+  </BottomLayout>
+</PageLayout>

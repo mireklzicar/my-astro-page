@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content"
 import type { ImageMetadata } from 'astro'
 
 type Props = {
-  entry: CollectionEntry<"blog"> | CollectionEntry<"projects"> | CollectionEntry<"publications">
+  entry: CollectionEntry<"blog"> | CollectionEntry<"projects"> | CollectionEntry<"publications"> | CollectionEntry<"talks">
   pill?: boolean
 }
 
