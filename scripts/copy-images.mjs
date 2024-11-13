@@ -1,9 +1,27 @@
-import fs from 'fs-extra';
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+async function ensureDir(dir) {
+  try {
+    await fs.access(dir);
+  } catch {
+    await fs.mkdir(dir, { recursive: true });
+  }
+}
+
+async function removeDir(dir) {
+  try {
+    await fs.rm(dir, { recursive: true, force: true });
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
 
 async function copyImages() {
   const contentDir = path.join(__dirname, '../src/content');
@@ -11,7 +29,8 @@ async function copyImages() {
 
   try {
     // Clear existing content directory in public
-    await fs.remove(publicDir);
+    await removeDir(publicDir);
+    await ensureDir(publicDir);
 
     // Read all content directories
     const contentTypes = await fs.readdir(contentDir);
@@ -33,13 +52,13 @@ async function copyImages() {
 
         // Create target directory
         const publicEntryDir = path.join(publicDir, type, entry);
-        await fs.ensureDir(publicEntryDir);
+        await ensureDir(publicEntryDir);
 
         // Copy images
         const files = await fs.readdir(entryDir);
         for (const file of files) {
           if (/\.(jpg|jpeg|png|gif|webp|avif)$/i.test(file)) {
-            await fs.copy(
+            await fs.copyFile(
               path.join(entryDir, file),
               path.join(publicEntryDir, file)
             );
