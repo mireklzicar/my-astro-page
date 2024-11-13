@@ -7,7 +7,7 @@ import partytown from "@astrojs/partytown";
 
 // Set base path for GitHub Pages, adjust if running locally
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
-const base = isGitHubPages ? '/repository-name' : '/';
+const base = isGitHubPages ? '/my-astro-page' : '/';
 
 export default defineConfig({
   site: "https://mireklzicar.com",
