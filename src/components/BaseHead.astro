@@ -54,6 +54,16 @@ const { title, description, image = "/open-graph.jpg" } = Astro.props
 <script is:inline src="/js/scroll.js"></script>
 <script is:inline src="/js/animate.js"></script>
 
+<!-- Google Analytics -->
+<script type="text/partytown" async src="https://www.googletagmanager.com/gtag/js?id=G-KH5NXR3L16"></script>
+<script type="text/partytown">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KH5NXR3L16');
+</script>
+
 <!-- <ViewTransitions  /> -->
 
 <script>
