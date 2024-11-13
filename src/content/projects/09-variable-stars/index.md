@@ -1,11 +1,16 @@
 ---
-title: "DFT quality Electrostatics with AI"
-summary: "An app to predict ESP and RESP partial charges for small molecules."
+title: "Variable Stars Classification and Clustering"
+summary: "A research project in high school for processing data of variable stars observation."
 date: "Mar 17 2022"
-draft: true
+draft: false
 tags:
-- CHEESE
-- Cheminformatics
-thumbnail: electrostatics.avif
-demoUrl: https://electrostatics.deepmedchem.com/
+- Python
+- Statistics
+- Physics
+thumbnail: stars.jpg
+demoUrl: https://gjk.cz/odysseus-contest-2017-variable-stars-and-how-to-find-them/
 ---
+
+Research project in high school for processing data of variable stars observation which was awarded in international competition (Odysseus contest).
+
+![img](stars.jpg)

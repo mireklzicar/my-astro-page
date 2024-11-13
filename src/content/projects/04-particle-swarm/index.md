@@ -10,3 +10,4 @@ tags:
 thumbnail: swarm.gif
 repoUrl: https://github.com/mireklzicar/Particle-Swarm-Optimization
 ---
+![img](swarm.gif)

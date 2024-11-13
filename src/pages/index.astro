@@ -116,9 +116,26 @@ const stack = [
     <article class="max-w-prose mx-auto px-4">
       <div class="mb-8">
         <p class="text-lg leading-relaxed">
-          Currently serving as the <span class="font-semibold">CTO of Deep MedChem</span>, I lead initiatives to revolutionize in-silico drug discovery through innovative AI solutions. Previously, I worked as a <span class="font-semibold">Machine Learning Researcher</span> at MAMA AI and as a <span class="font-semibold">Fullstack Software Engineer</span> at Charles University. I enjoy exploring novel applications in AI/ML, having conducted various research projects as a scientific programmer.
+          Currently serving as the <span class="font-semibold">CTO of Deep MedChem</span>, I lead initiatives to accelerate in-silico drug discovery through innovative AI solutions. Previously, I worked as a <span class="font-semibold">Machine Learning Researcher</span> at MAMA AI and as a <span class="font-semibold">Fullstack Software Engineer</span> at Charles University. I enjoy exploring novel applications of AI/ML.
         </p>
       </div>
+
+      <div class="flex flex-wrap gap-1 items-center justify-center">
+        {
+          SOCIALS.map((SOCIAL) => (
+            <a 
+              href={SOCIAL.HREF} 
+              target="_blank" 
+              aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`} 
+              class="group size-10 rounded-full p-2 items-center justify-center hover:bg-black/5 dark:hover:bg-white/20  blend"
+            >
+              <svg class="size-full fill-current group-hover:fill-black group-hover:dark:fill-white blend">
+                <use href={`/social.svg#${SOCIAL.ICON}`} />
+              </svg>
+            </a>
+          ))
+        }
+        </div>
 
     </article>
   </section>
@@ -196,7 +213,7 @@ const stack = [
       </section>
 
   
-        <!-- Contact Section -->
+      <!-- Contact Section 
       <section class="animate">
         <div>
           <p class="font-semibold text-black dark:text-white">
@@ -222,6 +239,7 @@ const stack = [
             ))}
         </div>
       </section>
+      -->
   
       <!-- Tech Stack Section -->
       <section class="animate">

@@ -1,15 +1,19 @@
 ---
-title: "CAD Construction in a Laser Hall"
+title: "Autonomous Space Vehicle Design"
 summary: "Learning Autodesk Inventor by Doing"
-date: "Mar 17 2022"
-draft: true
+date: "Oct 5 2018"
+draft: false
 tags:
-- Python
-- Dash
-thumbnail: construction.jpg
-demoUrl: https://www.eli-beams.eu/
+- CAD
+- Inventor
+- 3D Printing
+- Physics
+thumbnail: cansat.png
 ---
-During my internship in ELI Beamlines I designed a construction for vacuum chamber doors in a laser hall. And I improved my CAD skills along the way!
+- An internship at the Institute of Atmospheric Physics (Czech Academy of Sciences) where I learned CAD and designed my own prototype of an autonomous space vehicle with constraints on its size and weight, coming up with a novel mechanical design of expandable wheels.
+- The design was 3D printed an assembled with motors and electronics to create a fully functional prototype.
+- My project won 1st place on a scientific conference in the category of Natural Sciences.
 
-![](construction.jpg)
-![](stand.jpg)
+![](cansat.jpg)
+
+![](cansat_inside.jpg)

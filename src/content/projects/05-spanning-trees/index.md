@@ -8,6 +8,8 @@ tags:
 - Graph Theory
 - Scipy
 - NetworkX
-thumbnail: swarm.gif
+thumbnail: petersen.gif
 repoUrl: https://github.com/mireklzicar/Spanning-trees-search
 ---
+
+![](petersen.gif)

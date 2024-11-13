@@ -1,7 +1,7 @@
 ---
 title: "Issue Duration Labeller"
 summary: "A Github Action to label issues based on their duration."
-date: "Mar 17 2022"
+date: "June 20 2023"
 draft: false
 tags:
 - Github
