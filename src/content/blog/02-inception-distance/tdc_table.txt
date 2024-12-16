@@ -1,0 +1,24 @@
+| Dataset | Metric | SOTA Model | SOTA Features |
+|----------|---------|--------|-----------|
+| Ames Mutagenicity [2] | AUROC ↑ | Boosted Trees | Fingerprints |
+| Blood Brain Barrier [3] | AUROC ↑ | Boosted Trees | Fingerprints |
+| Oral Bioavailability [4] | AUROC ↑ | GNN | Neural |
+| Volume of Distribution [5] | Spearman ↑ | Boosted Trees + GNN | Both |
+| Hepatocyte Clearance [6] | Spearman ↑ | Boosted Trees | Fingerprints |
+| Microsome Clearance [6] | Spearman ↑ | Boosted Trees + GNN | Both |
+| CYP P450 2C9 Substrate [7] | AUPRC ↑ | Boosted Trees | Fingerprints |
+| CYP P450 2C9 Inhibition [8] | AUPRC ↑ | Boosted Trees + GNN | Both |
+| CYP P450 2D6 Substrate [7] | AUPRC ↑ | Boosted Trees | Fingerprints |
+| CYP P450 2D6 Inhibition [8] | AUPRC ↑ | Boosted Trees + GNN | Both |
+| CYP P450 3A4 Substrate [7] | AUPRC ↑ | Boosted Trees | Fingerprints |
+| CYP P450 3A4 Inhibition [8] | AUPRC ↑ | Boosted Trees + GNN | Both |
+| Drug Induced Liver Injury | AUROC ↑ | Boosted Trees | Fingerprints |
+| Terminal Phase Half Life [9] | Spearman ↑ | Boosted Trees | Fingerprints |
+| hERG Inhibition | AUROC ↑ | Boosted Trees + GNN | Both |
+| Human Intestinal Absorption [10] | AUROC ↑ | Boosted Trees | Fingerprints |
+| P-glycoprotein Inhibition [11] | AUROC ↑ | Boosted Trees + GNN | Both |
+| Plasma Protein Binding Rate [6] | MAE ↓ | Transformer | Neural |
+| Aqueous Solubility [12] | MAE ↓ | Transformer | Neural | 
+| Caco-2 Effective Permeability [13] | MAE ↓ | Boosted Trees | Fingerprints |
+| Acute Toxicity LD50 | MAE ↓ | Transformer | Neural |
+| Lipophilicity [6] | MAE ↓ | Transformer | Neural |
