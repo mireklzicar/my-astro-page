@@ -10,7 +10,7 @@
     "dev": "astro dev",
     "dev:network": "astro dev --host",
     "start": "astro dev",
-    "build": "node scripts/copy-images.mjs && astro build",
+    "build": "node scripts/copy-images.mjs && node scripts/copy-pdf.mjs && astro build",
     "preview": "astro preview",
     "preview:network": "astro dev --host",
     "astro": "astro",
