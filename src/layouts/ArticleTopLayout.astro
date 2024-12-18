@@ -9,19 +9,41 @@ interface Props {
 const { entry } = Astro.props;
 const { data, collection, body } = entry;
 const { title, summary, date } = data;
-const allowedCollections = ['projects', 'publications', 'talks'] as const;
+const allowedCollections = ['projects', 'publications', 'talks', 'blog'] as const;
 
 // Type guard function
 const hasDemoUrl = (data: any): data is { demoUrl?: string } => {
   return 'demoUrl' in data;
 };
 
+const hasOriginalUrl = (data: any): data is { originalUrl?: string } => {
+  return 'originalUrl' in data;
+};
+
+const hasReadMoreUrl = (data: any): data is { readMoreUrl?: string } => {
+  return 'readMoreUrl' in data;
+};
+
 const hasXUrl = (data: any): data is { xUrl?: string } => {
   return 'xUrl' in data;
 };
 
+const hasPdfUrl = (data: any): data is { pdfUrl?: string } => {
+  return 'pdfUrl' in data;
+};
+
+const getPdfPath = (filename: string) => {
+    if (import.meta.env.DEV) {
+      return `/src/content/${entry.collection}/${entry.slug}/${filename}`;
+    }
+    // For production, use the path where images will be copied during build
+    return `/content/${entry.collection}/${entry.slug}/${filename}`;
+};
+
 // Handle different URL types for different collections
 const demoUrl = allowedCollections.includes(collection as any) && hasDemoUrl(data) ? data.demoUrl : null;
+const readMoreUrl = allowedCollections.includes(collection as any) && hasReadMoreUrl(data) ? data.readMoreUrl : null;
+const originalUrl = allowedCollections.includes(collection as any) && hasOriginalUrl(data) ? data.originalUrl : null;
 const repoUrl = collection === "projects" ? data.repoUrl : null;
 const publicationUrl = collection === "publications" ? data.publicationUrl : null;
 const arxivUrl = collection === "publications" ? data.arxivUrl : null;
@@ -29,6 +51,8 @@ const zenodoUrl = collection === "publications" ? data.zenodoUrl : null;
 const githubUrl = collection === "publications" ? data.githubUrl : null;
 const xUrl = allowedCollections.includes(collection as any) && hasXUrl(data) ? data.xUrl : null;
 const youtubeUrl = collection === "talks" ? data.youtubeUrl : null;
+const pdfUrl = allowedCollections.includes(collection as any) && hasPdfUrl(data) ? getPdfPath(data.pdfUrl) : null;
+
 ---
 
 <div>
@@ -61,7 +85,7 @@ const youtubeUrl = collection === "talks" ? data.youtubeUrl : null;
   <div class="mt-1">
     {summary}
   </div>
-  {(demoUrl || repoUrl || publicationUrl || arxivUrl || zenodoUrl || githubUrl || xUrl || youtubeUrl) && 
+  {(demoUrl || repoUrl || publicationUrl || arxivUrl || zenodoUrl || githubUrl || xUrl || youtubeUrl || originalUrl || readMoreUrl) &&
     <div class="mt-4 flex flex-wrap gap-2">
       {demoUrl && 
         <a href={demoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
@@ -140,6 +164,41 @@ const youtubeUrl = collection === "talks" ? data.youtubeUrl : null;
           </svg>
           <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
             YouTube
+          </span>
+        </a>
+      }
+      {originalUrl && 
+        <a href={originalUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#scroll" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Original Article
+          </span>
+        </a>
+      }
+      {readMoreUrl && 
+        <a href={readMoreUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#book" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Read More
+          </span>
+        </a>
+      }
+      {pdfUrl && 
+        <a 
+          href={pdfUrl} 
+          target="_blank" 
+          download 
+          class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend"
+        >
+          <svg class="size-4">
+            <use href="/ui.svg#pdf" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Download PDF
           </span>
         </a>
       }

@@ -37,7 +37,7 @@ jobs:
       - name: Prepare public directory
         run: |
             mkdir -p public
-            node scripts/copy-images.mjs
+            node scripts/copy-assets.mjs
 
       - name: Setup Pages
         id: pages

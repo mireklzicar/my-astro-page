@@ -23,12 +23,12 @@ async function removeDir(dir) {
   }
 }
 
-async function copyImages() {
+async function copyAssets() {
   const contentDir = path.join(__dirname, '../src/content');
   const publicDir = path.join(__dirname, '../public/content');
 
   try {
-    // Clear existing content directory in public
+    // Clear existing content directory in public only once
     await removeDir(publicDir);
     await ensureDir(publicDir);
 
@@ -54,10 +54,10 @@ async function copyImages() {
         const publicEntryDir = path.join(publicDir, type, entry);
         await ensureDir(publicEntryDir);
 
-        // Copy images
+        // Copy both images and PDFs
         const files = await fs.readdir(entryDir);
         for (const file of files) {
-          if (/\.(jpg|jpeg|png|gif|webp|avif)$/i.test(file)) {
+          if (/\.(jpg|jpeg|png|gif|webp|avif|pdf)$/i.test(file)) {
             await fs.copyFile(
               path.join(entryDir, file),
               path.join(publicEntryDir, file)
@@ -67,11 +67,11 @@ async function copyImages() {
       }
     }
 
-    console.log('✓ Images copied successfully');
+    console.log('✓ Assets (images and PDFs) copied successfully');
   } catch (error) {
-    console.error('Error copying images:', error);
+    console.error('Error copying assets:', error);
     process.exit(1);
   }
 }
 
-copyImages();
+copyAssets();
