@@ -1,5 +1,5 @@
 ---
-title: "Memecoins as a Vanity Fair: only 1 in 100 000 Solana tokens has a social footprint and clears a basic rug‑check"
+title: "Memecoins as a Vanity Fair: only 1 in 10 000 Solana tokens has a social footprint and clears a basic rug‑check"
 summary: "Using on‑chain metadata for every token minted on Solana in February 2025, we show that fewer than 0.01 % of fresh meme‑coins meet even the loosest criteria for legitimacy."
 date: "May 18 2025"
 draft: false
@@ -50,7 +50,7 @@ Instead, I try to quantify just how *lottery‑like* the memecoin field has beco
 | **With ≥ 1 social link**       |     742 |  0.10 % |
 | **Pass *all* rug‑check tests** |      91 | 0.012 % |
 
-Put differently, **only one in \~100 000 freshly minted Solana tokens both tells you who they are *and* shows no obvious technical red flags**.
+Put differently, **only one in \~10 000 freshly minted Solana tokens both tells you who they are *and* shows no obvious technical red flags**.
 
 ### Which socials matter?
 
