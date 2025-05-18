@@ -56,11 +56,13 @@ const blog = defineCollection({
     summary: z.string(),
     date: z.coerce.date(),
     tags: z.array(z.string()),
+    category: z.enum(["tech", "personal"]).default("tech"),
     draft: z.boolean().optional(),
     thumbnail: z.string().optional(),
     originalUrl: z.string().optional(),
     readMoreUrl: z.string().optional(),
-    pdfUrl: z.string().optional()
+    pdfUrl: z.string().optional(),
+    toc: z.boolean().optional().default(false)
   }),
 })
 

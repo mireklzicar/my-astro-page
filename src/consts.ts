@@ -13,10 +13,20 @@ export const WORK: Page = {
   DESCRIPTION: "Places I have worked.",
 }
 
-// Blog Page
+// Blog Pages
 export const BLOG: Page = {
   TITLE: "Blog",
   DESCRIPTION: "Writing on topics I am passionate about.",
+}
+
+export const TECH_BLOG: Page = {
+  TITLE: "Tech",
+  DESCRIPTION: "Writing on technical topics and research.",
+}
+
+export const PERSONAL_BLOG: Page = {
+  TITLE: "Culture",
+  DESCRIPTION: "Writing on personal interests and thoughts.",
 }
 
 export const PUBLICATIONS: Page = {
@@ -45,29 +55,33 @@ export const SEARCH: Page = {
 
 // Links
 export const LINKS: Links = [
-  { 
-    TEXT: "Home", 
-    HREF: "/", 
+  {
+    TEXT: "Home",
+    HREF: "/",
   },
-  // { 
-  //   TEXT: "Work", 
-  //   HREF: "/work", 
+  // {
+  //   TEXT: "Work",
+  //   HREF: "/work",
   // },
-  { 
-    TEXT: "Blog", 
-    HREF: "/blog", 
+  {
+    TEXT: "Tech",
+    HREF: "/blog/tech",
   },
-  { 
-    TEXT: "Publications", 
-    HREF: "/publications", 
+  {
+    TEXT: "Culture",
+    HREF: "/blog/personal",
   },
-  { 
-    TEXT: "Projects", 
-    HREF: "/projects", 
+  {
+    TEXT: "Publications",
+    HREF: "/publications",
   },
-  { 
-    TEXT: "Talks", 
-    HREF: "/talks", 
+  {
+    TEXT: "Projects",
+    HREF: "/projects",
+  },
+  {
+    TEXT: "Talks",
+    HREF: "/talks",
   },
 ]
 

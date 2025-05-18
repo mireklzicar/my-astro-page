@@ -12,9 +12,15 @@ const publications = (await getCollection("publications"))
 
 const tags = [...new Set(publications.flatMap(publication => publication.data.tags))]
   .sort((a, b) => a.localeCompare(b))
+
+// Get the first publication with a thumbnail for the Open Graph image
+const firstPublicationWithThumbnail = publications.find(publication => publication.data.thumbnail)
+const imagePath = firstPublicationWithThumbnail?.data.thumbnail
+  ? `/content/publications/${firstPublicationWithThumbnail.slug}/${firstPublicationWithThumbnail.data.thumbnail}`
+  : undefined
 ---
 
-<PageLayout title={PUBLICATIONS.TITLE} description={PUBLICATIONS.DESCRIPTION}>
+<PageLayout title={PUBLICATIONS.TITLE} description={PUBLICATIONS.DESCRIPTION} image={imagePath}>
   <TopLayout>
     <div class="animate page-heading">
       {PUBLICATIONS.TITLE}

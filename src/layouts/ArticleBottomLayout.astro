@@ -8,7 +8,10 @@ type Props = {
 // Get the requested entry
 const { entry } = Astro.props
 const { collection } = entry
-const { Content } = await entry.render()
+const { Content, headings } = await entry.render()
+
+// Check if table of contents is enabled
+const showToc = 'toc' in entry.data && entry.data.toc === true
 
 // Get the next and prev entries (modulo to wrap index)
 const items = (await getCollection(collection))
@@ -21,6 +24,23 @@ const next = items[(index + 1) % items.length]
 
 <div>
   <article>
+    {showToc && headings.length > 0 && (
+      <div class="toc-container mb-8 p-4 border border-black/15 dark:border-white/20 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4">Table of Contents</h2>
+        <ul class="space-y-2">
+          {headings
+            .filter(heading => heading.depth <= 3) // Only include h1, h2, h3
+            .map(heading => (
+              <li class={`toc-item toc-level-${heading.depth}`} style={`margin-left: ${(heading.depth - 1) * 1.5}rem`}>
+                <a href={`#${heading.slug}`} class="hover:text-black dark:hover:text-white hover:underline blend">
+                  {heading.text}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    )}
     <Content/>
   </article>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

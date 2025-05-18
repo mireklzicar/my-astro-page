@@ -105,6 +105,34 @@ article img {
 }
 
 /**
+ * Table of Contents
+ */
+.toc-container {
+  @apply bg-white/50 dark:bg-black/50;
+  @apply backdrop-blur-sm;
+}
+
+.toc-container ul {
+  @apply list-none p-0 m-0;
+}
+
+.toc-item {
+  @apply py-1;
+}
+
+.toc-level-1 {
+  @apply font-semibold;
+}
+
+.toc-level-2 {
+  @apply text-sm;
+}
+
+.toc-level-3 {
+  @apply text-xs opacity-80;
+}
+
+/**
  * TWINKLE STARS
  */
 

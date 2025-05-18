@@ -12,9 +12,15 @@ const talks = (await getCollection("talks"))
 
 const tags = [...new Set(talks.flatMap(talk => talk.data.tags))]
   .sort((a, b) => a.localeCompare(b))
+
+// Get the first talk with a thumbnail for the Open Graph image
+const firstTalkWithThumbnail = talks.find(talk => talk.data.thumbnail)
+const imagePath = firstTalkWithThumbnail?.data.thumbnail
+  ? `/content/talks/${firstTalkWithThumbnail.slug}/${firstTalkWithThumbnail.data.thumbnail}`
+  : undefined
 ---
 
-<PageLayout title={TALKS.TITLE} description={TALKS.DESCRIPTION}>
+<PageLayout title={TALKS.TITLE} description={TALKS.DESCRIPTION} image={imagePath}>
   <TopLayout>
     <div class="animate page-heading">
       {TALKS.TITLE}

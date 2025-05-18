@@ -18,10 +18,15 @@ export async function getStaticPaths() {
 // Get the requested project
 type Props = CollectionEntry<"projects">
 const project = Astro.props
-const { title, summary } = project.data
+const { title, summary, thumbnail } = project.data
+
+// Construct the image path if thumbnail exists
+const imagePath = thumbnail
+  ? `/content/projects/${project.slug}/${thumbnail}`
+  : undefined
 ---
 
-<PageLayout title={title} description={summary}>
+<PageLayout title={title} description={summary} image={imagePath}>
   <TopLayout>
     <div class="animate">
       <ArticleTopLayout entry={project} />

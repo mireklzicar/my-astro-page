@@ -21,10 +21,15 @@ interface Props {
 }
 
 const { entry: publication } = Astro.props;
-const { title, summary } = publication.data
+const { title, summary, thumbnail } = publication.data
+
+// Construct the image path if thumbnail exists
+const imagePath = thumbnail
+  ? `/content/publications/${publication.slug}/${thumbnail}`
+  : undefined
 ---
 
-<PageLayout title={title} description={summary}>
+<PageLayout title={title} description={summary} image={imagePath}>
   <TopLayout>
     <div class="animate">
       <ArticleTopLayout entry={publication} />

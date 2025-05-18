@@ -12,9 +12,15 @@ const projects = (await getCollection("projects"))
 
 const tags = [...new Set(projects.flatMap(project => project.data.tags))]
   .sort((a, b) => a.localeCompare(b))
+
+// Get the first project with a thumbnail for the Open Graph image
+const firstProjectWithThumbnail = projects.find(project => project.data.thumbnail)
+const imagePath = firstProjectWithThumbnail?.data.thumbnail
+  ? `/content/projects/${firstProjectWithThumbnail.slug}/${firstProjectWithThumbnail.data.thumbnail}`
+  : undefined
 ---
 
-<PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION}>
+<PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION} image={imagePath}>
   <TopLayout>
     <div class="animate page-heading">
       {PROJECTS.TITLE}
