@@ -1,0 +1,270 @@
+---
+title: "Test Blog Post: Exploring Features"
+summary: "A test post to demonstrate Markdown and MDX capabilities."
+date: "20 February 2000"
+tags:
+- markdown
+- mdx
+- features
+category: tech
+draft: false
+toc: true
+originalUrl: none
+pdfUrl: none.pdf
+---
+
+import Math from '@components/Math.astro';
+import Admonition from '@components/Admonition.astro';
+import Button from '@components/Button.astro';
+import Animation from '@components/Animation.astro';
+import Table from '@components/Table.astro';
+import CounterButton from '@components/CounterButton.astro';
+import ConfettiButton from '@components/ConfettiButton.astro';
+import References from '@components/References.astro';
+import Citation from '@components/Citation.astro';
+import Cite from '@components/Cite.astro';
+
+## Welcome to the Test Post!
+
+This post is a test of various features that can be used in this Astro blog.
+
+### Markdown
+
+* Blockquotes:
+    > This is a blockquote. It's useful for highlighting text from other sources.
+
+* Code blocks:
+    ```javascript
+    // This is a JavaScript code block
+    function greet(name) {
+      console.log(`Hello, ${name}!`);
+    }
+    greet('World');
+    ```
+
+### Math Rendering with KaTeX
+
+This blog supports math rendering using KaTeX! Here are some examples that demonstrate the LaTeX-style math rendering capabilities.
+
+#### Inline Math
+
+In physics, the famous equation <Math formula="E = mc^2" /> relates energy and mass. The Pythagorean theorem states that <Math formula="a^2 + b^2 = c^2" /> for right triangles. The quadratic formula <Math formula="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}" /> gives solutions to quadratic equations.
+
+For complex numbers, we have <Math formula="e^{i\theta} = \cos\theta + i\sin\theta" />. The probability density function of a normal distribution is <Math formula="f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}" />.
+
+#### Block Math
+
+The definition of a derivative:
+
+<Math formula="f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}" display={true} />
+
+Euler's identity, one of the most beautiful equations in mathematics:
+
+<Math formula="e^{i\pi} + 1 = 0" display={true} />
+
+The Gaussian integral:
+
+<Math formula="\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}" display={true} />
+
+#### Equation Systems and Alignment
+
+Maxwell's equations in differential form:
+
+<Math formula="\begin{aligned}
+\nabla \cdot \vec{E} &= \frac{\rho}{\varepsilon_0} \\
+\nabla \cdot \vec{B} &= 0 \\
+\nabla \times \vec{E} &= -\frac{\partial \vec{B}}{\partial t} \\
+\nabla \times \vec{B} &= \mu_0 \vec{J} + \mu_0 \varepsilon_0 \frac{\partial \vec{E}}{\partial t}
+\end{aligned}" display={true} />
+
+## MDX Capabilities
+
+Since this blog supports MDX, you can import and use components. Here are some examples of the components we've created:
+
+### Admonitions
+
+Admonitions are great for highlighting important information:
+
+<div class="flex flex-col md:flex-row gap-4 my-6">
+  <div class="flex-1">
+    <Admonition type="note" compact={true}>
+      This is a compact note admonition.
+    </Admonition>
+    
+    <Admonition type="tip" title="Pro Tip" compact={true}>
+      You can customize the title of admonitions.
+    </Admonition>
+  </div>
+  
+  <div class="flex-1">
+    <Admonition type="info" compact={true}>
+      Admonitions come in different types.
+    </Admonition>
+    
+    <Admonition type="warning" compact={true}>
+      Be careful with this feature!
+    </Admonition>
+    
+    <Admonition type="danger" compact={true}>
+      This action cannot be undone!
+    </Admonition>
+  </div>
+</div>
+
+<Admonition type="info">
+  These are the standard-sized admonitions with more detailed information. They're perfect for when you need to provide more context or explanation about a particular topic or feature.
+</Admonition>
+
+### Buttons
+
+Buttons can be used for calls to action:
+
+<div class="flex flex-wrap gap-4 my-6">
+  <Button variant="primary">Primary Button</Button>
+  <Button variant="secondary">Secondary Button</Button>
+  <Button variant="outline">Outline Button</Button>
+  <Button variant="ghost">Ghost Button</Button>
+</div>
+
+<div class="flex flex-wrap gap-4 my-6">
+  <Button variant="primary" size="sm">Small Button</Button>
+  <Button variant="primary" size="md">Medium Button</Button>
+  <Button variant="primary" size="lg">Large Button</Button>
+</div>
+
+<Button href="https://astro.build" variant="primary">Link Button</Button>
+
+### Tables
+
+Tables are useful for displaying structured data:
+
+<Table
+  headers={["Name", "Type", "Description"]}
+  rows={[
+    ["Button", "Component", "Interactive button element"],
+    ["Admonition", "Component", "Highlighted information box"],
+    ["Math", "Component", "LaTeX math rendering"],
+    ["Animation", "Component", "Animated elements"],
+    ["Table", "Component", "Structured data display"]
+  ]}
+  caption="Components in this blog"
+  striped={true}
+  bordered={true}
+  hover={true}
+/>
+
+### Animations
+
+Add some life to your content with animations:
+
+<Animation type="fade" duration={1.5}>
+  <div class="p-4 bg-blue-100 dark:bg-blue-900 rounded-md my-4">
+    This content fades in.
+  </div>
+</Animation>
+
+<Animation type="slide" duration={1} delay={0.5}>
+  <div class="p-4 bg-green-100 dark:bg-green-900 rounded-md my-4">
+    This content slides in from below.
+  </div>
+</Animation>
+
+<Animation type="bounce" iterations="infinite" duration={2}>
+  <div class="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-md my-4 inline-block">
+    This content bounces infinitely.
+  </div>
+</Animation>
+
+### Interactive Components (JSX)
+
+MDX allows you to use interactive components directly in your markdown. Here's a counter component:
+
+<CounterButton initialValue={0} step={1} min={-10} max={10} label="Basic Counter" />
+
+
+### Interactive Components
+
+#### Confetti Celebration
+
+Click the button below to trigger a full-page confetti celebration:
+
+<div class="flex justify-center my-8">
+  <ConfettiButton buttonText="🎉 Celebrate with Confetti! 🎉" />
+</div>
+
+
+### Custom JSX Logic
+
+MDX allows you to include custom JSX logic directly in your markdown:
+
+export const Highlight = ({children, color}) => (
+  <span style={{
+    backgroundColor: color,
+    borderRadius: '0.25rem',
+    color: '#fff',
+    padding: '0.25rem 0.5rem',
+  }}>
+    {children}
+  </span>
+);
+
+<p>
+  This text has a <Highlight color="#25c2a0">green highlight</Highlight> and
+  this text has a <Highlight color="#1877F2">blue highlight</Highlight>.
+</p>
+
+export const today = new Date();
+
+<p>Today's date is: {today.toDateString()}</p>
+
+## References
+
+### Using Citations
+
+You can cite sources using the Cite component like this <Cite id="first-citation" /> and this <Cite id="second-citation" />. The citations will appear where you place the References component.
+
+### Custom Placement
+
+The key difference is that you can now control where your references appear by placing the `<References>` component in your MDX file.
+
+```jsx
+<References title="References">
+  <Citation id="first-citation">
+    This is the first citation.
+  </Citation>
+  <Citation id="second-citation">
+    This is the second citation.
+  </Citation>
+</References>
+```
+
+You can also customize the title or omit it:
+
+```jsx
+<References title="Sources">
+  <Citation id="example1">
+    Citation content here
+  </Citation>
+</References>
+
+<!-- Or without a title -->
+<References>
+  <Citation id="example2">
+    Another citation here
+  </Citation>
+</References>
+```
+
+<References title="References">
+  <Citation id="first-citation">
+    This is the first citation. It can include links, *formatting*, and other Markdown elements.
+  </Citation>
+  
+  <Citation id="second-citation">
+    Smith, J. (2025). *How to Use References in MDX*. Example Publishing.
+  </Citation>
+</References>
+
+## Conclusion
+
+This post demonstrates the powerful capabilities of MDX in Astro, allowing you to combine the simplicity of Markdown with the flexibility of JSX components. You can create rich, interactive content that goes beyond what traditional Markdown can offer.

@@ -1,0 +1,106 @@
+---
+import { createSignal } from 'solid-js';
+
+interface Props {
+  buttonText?: string;
+  buttonClass?: string;
+}
+
+const {
+  buttonText = 'Celebrate!',
+  buttonClass = 'px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105'
+} = Astro.props;
+---
+
+<button 
+  id="confetti-button"
+  class={buttonClass}
+>
+  {buttonText}
+</button>
+
+<script>
+  // This script only runs on the client side
+  const button = document.getElementById('confetti-button');
+  
+  let confettiModule: any = null;
+  let confettiLoaded = false;
+
+  // Load the confetti module
+  import('canvas-confetti')
+    .then(module => {
+      confettiModule = module.default;
+      confettiLoaded = true;
+      if (button) {
+        (button as HTMLButtonElement).disabled = false;
+      }
+    })
+    .catch(error => {
+      console.error('Failed to load confetti:', error);
+    });
+
+  // Add click event listener
+  if (button) {
+    button.addEventListener('click', () => {
+      if (!confettiLoaded || !confettiModule) return;
+      
+      const duration = 300;
+      const end = Date.now() + duration;
+
+      // Create a canvas for the confetti if it doesn't exist
+      const canvasId = 'confetti-canvas';
+      let canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+      
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = canvasId;
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '9999';
+        document.body.appendChild(canvas);
+      }
+
+      const myConfetti = confettiModule.create(canvas, {
+        resize: true,
+        useWorker: true
+      });
+
+      // Firework effect
+      const firework = () => {
+        const timeLeft = end - Date.now();
+        
+        if (timeLeft <= 0) {
+          // Remove the canvas when animation is complete
+          setTimeout(() => {
+            if (canvas && canvas.parentNode) {
+              canvas.parentNode.removeChild(canvas);
+            }
+          }, 2000);
+          return;
+        }
+        
+        // Random colors
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        
+        // Launch multiple confetti bursts
+        myConfetti({
+          particleCount: 300,
+          spread: 120,
+          origin: { y: 0.6 },
+          colors: colors,
+          disableForReducedMotion: true
+        });
+        
+        // Schedule next burst
+        requestAnimationFrame(firework);
+      };
+
+      // Start the firework animation
+      firework();
+    });
+  }
+</script>

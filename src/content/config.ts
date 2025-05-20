@@ -32,8 +32,11 @@ const talks = defineCollection({
     thumbnail: z.string().optional(),
     youtubeUrl: z.string().optional(),
     xUrl: z.string().optional(),
+    githubUrl: z.string().optional(),
+    zenodoUrl: z.string().optional(),
     originalUrl: z.string().optional(),
-    readMoreUrl: z.string().optional()
+    readMoreUrl: z.string().optional(),
+    pdfUrl: z.string().optional()
   }),
 })
 
@@ -62,6 +65,9 @@ const blog = defineCollection({
     originalUrl: z.string().optional(),
     readMoreUrl: z.string().optional(),
     pdfUrl: z.string().optional(),
+    githubUrl: z.string().optional(),
+    zenodoUrl: z.string().optional(),
+    xUrl: z.string().optional(),
     toc: z.boolean().optional().default(false)
   }),
 })
@@ -77,6 +83,9 @@ const projects = defineCollection({
     readMoreUrl: z.string().optional(),
     demoUrl: z.string().optional(),
     repoUrl: z.string().optional(),
+    githubUrl: z.string().optional(),
+    zenodoUrl: z.string().optional(),
+    xUrl: z.string().optional(),
     thumbnail: z.string().optional(),
     originalUrl: z.string().optional(),
     pdfUrl: z.string().optional()

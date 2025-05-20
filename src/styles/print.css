@@ -1,0 +1,140 @@
+/* Print-specific styles */
+@media print {
+  /* Set page margins and size */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  /* Hide elements that shouldn't be printed */
+  header, 
+  footer, 
+  nav,
+  button,
+  .download-csv-btn,
+  .copy-button,
+  .print-button,
+  #meteors,
+  #twinkle-star,
+  .toc-container {
+    display: none !important;
+  }
+
+  /* Basic styling for the printed page */
+  html, body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000 !important;
+    background-color: #fff !important;
+    font-family: "Atkinson", serif;
+  }
+
+  /* Ensure full width content */
+  main, article, .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Headings */
+  h1 {
+    font-size: 24pt;
+    margin-bottom: 0.5cm;
+    page-break-after: avoid;
+  }
+
+  h2 {
+    font-size: 18pt;
+    margin-top: 1cm;
+    margin-bottom: 0.5cm;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 14pt;
+    margin-top: 0.8cm;
+    margin-bottom: 0.3cm;
+    page-break-after: avoid;
+  }
+
+  /* Improve table printing */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1cm 0;
+    page-break-inside: avoid;
+  }
+
+  table, th, td {
+    border: 1px solid #000;
+  }
+
+  th, td {
+    padding: 0.2cm;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold;
+  }
+
+  /* Ensure images print well */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+    display: block;
+    margin: 0.5cm auto;
+  }
+
+  /* Add page breaks before major sections */
+  h1, h2 {
+    page-break-before: auto;
+    page-break-after: avoid;
+  }
+
+  /* Avoid page breaks inside paragraphs */
+  p, li, blockquote {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure links print with their URLs */
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    font-weight: normal;
+    color: #666;
+  }
+
+  /* But don't print URLs for internal links */
+  a[href^="#"]:after,
+  a[href^="javascript:"]:after {
+    content: "";
+  }
+
+  /* Ensure code blocks print well */
+  pre, code {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    border: 1px solid #ddd !important;
+    padding: 0.3cm !important;
+    background-color: #f9f9f9 !important;
+    color: #333 !important;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 10pt;
+  }
+
+  /* Hide code block headers */
+  .code-header {
+    display: none !important;
+  }
+
+  /* Add a footer with page numbers */
+  @page {
+    @bottom-center {
+      content: counter(page);
+    }
+  }
+}

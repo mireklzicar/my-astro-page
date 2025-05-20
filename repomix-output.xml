@@ -1,0 +1,3394 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: public, src/content
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.github/
+  workflows/
+    deploy.yml
+scripts/
+  copy-assets.mjs
+  copy-pdf.mjs
+src/
+  components/
+    ArrowCard.tsx
+    BaseHead.astro
+    Blog.tsx
+    Container.astro
+    Counter.tsx
+    Drawer.astro
+    Footer.astro
+    Header.astro
+    MeteorShower.astro
+    Projects.tsx
+    Publications.tsx
+    Search.tsx
+    StackCard.astro
+    Talks.tsx
+    TwinklingStars.astro
+  layouts/
+    ArticleBottomLayout.astro
+    ArticleTopLayout.astro
+    BottomLayout.astro
+    PageLayout.astro
+    TopLayout.astro
+  lib/
+    utils.ts
+  pages/
+    blog/
+      personal/
+        index.astro
+      tech/
+        index.astro
+      [...slug].astro
+      index.astro
+    legal/
+      [...slug].astro
+    projects/
+      [...slug].astro
+      index.astro
+    publications/
+      [...slug].astro
+      index.astro
+    search/
+      index.astro
+    talks/
+      [...slug].astro
+      index.astro
+    work/
+      index.astro
+    contact.astro
+    index.astro
+    robots.txt.ts
+    rss.xml.ts
+    thank-you.astro
+  styles/
+    global.css
+  consts.ts
+  env.d.ts
+  types.ts
+.gitignore
+astro.config.mjs
+LICENSE
+package.json
+README.md
+tailwind.config.mjs
+tsconfig.json
+vite.config.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="scripts/copy-assets.mjs">
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function ensureDir(dir) {
+  try {
+    await fs.access(dir);
+  } catch {
+    await fs.mkdir(dir, { recursive: true });
+  }
+}
+
+async function removeDir(dir) {
+  try {
+    await fs.rm(dir, { recursive: true, force: true });
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
+
+async function copyAssets() {
+  const contentDir = path.join(__dirname, '../src/content');
+  const publicDir = path.join(__dirname, '../public/content');
+
+  try {
+    // Clear existing content directory in public only once
+    await removeDir(publicDir);
+    await ensureDir(publicDir);
+
+    // Read all content directories
+    const contentTypes = await fs.readdir(contentDir);
+
+    for (const type of contentTypes) {
+      const typeDir = path.join(contentDir, type);
+      const stats = await fs.stat(typeDir);
+      
+      if (!stats.isDirectory()) continue;
+
+      // Read all project directories
+      const entries = await fs.readdir(typeDir);
+
+      for (const entry of entries) {
+        const entryDir = path.join(typeDir, entry);
+        const stats = await fs.stat(entryDir);
+        
+        if (!stats.isDirectory()) continue;
+
+        // Create target directory
+        const publicEntryDir = path.join(publicDir, type, entry);
+        await ensureDir(publicEntryDir);
+
+        // Copy both images and PDFs
+        const files = await fs.readdir(entryDir);
+        for (const file of files) {
+          if (/\.(jpg|jpeg|png|gif|webp|avif|pdf)$/i.test(file)) {
+            await fs.copyFile(
+              path.join(entryDir, file),
+              path.join(publicEntryDir, file)
+            );
+          }
+        }
+      }
+    }
+
+    console.log('✓ Assets (images and PDFs) copied successfully');
+  } catch (error) {
+    console.error('Error copying assets:', error);
+    process.exit(1);
+  }
+}
+
+copyAssets();
+</file>
+
+<file path="scripts/copy-pdf.mjs">
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function ensureDir(dir) {
+  try {
+    await fs.access(dir);
+  } catch {
+    await fs.mkdir(dir, { recursive: true });
+  }
+}
+
+async function removeDir(dir) {
+  try {
+    await fs.rm(dir, { recursive: true, force: true });
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
+
+async function copyPDFs() {
+  const contentDir = path.join(__dirname, '../src/content');
+  const publicDir = path.join(__dirname, '../public/content');
+
+  try {
+    // Clear existing content directory in public
+    await removeDir(publicDir);
+    await ensureDir(publicDir);
+
+    // Read all content directories
+    const contentTypes = await fs.readdir(contentDir);
+
+    for (const type of contentTypes) {
+      const typeDir = path.join(contentDir, type);
+      const stats = await fs.stat(typeDir);
+      
+      if (!stats.isDirectory()) continue;
+
+      // Read all project directories
+      const entries = await fs.readdir(typeDir);
+
+      for (const entry of entries) {
+        const entryDir = path.join(typeDir, entry);
+        const stats = await fs.stat(entryDir);
+        
+        if (!stats.isDirectory()) continue;
+
+        // Create target directory
+        const publicEntryDir = path.join(publicDir, type, entry);
+        await ensureDir(publicEntryDir);
+
+        // Copy PDFs
+        const files = await fs.readdir(entryDir);
+        for (const file of files) {
+          if (/\.pdf$/i.test(file)) {
+            await fs.copyFile(
+              path.join(entryDir, file),
+              path.join(publicEntryDir, file)
+            );
+          }
+        }
+      }
+    }
+
+    console.log('✓ PDFs copied successfully');
+  } catch (error) {
+    console.error('Error copying PDFs:', error);
+    process.exit(1);
+  }
+}
+
+copyPDFs();
+</file>
+
+<file path="src/components/Blog.tsx">
+import type { CollectionEntry } from "astro:content"
+import { createEffect, createSignal, For } from "solid-js"
+import ArrowCard from "@components/ArrowCard"
+import { cn } from "@lib/utils"
+
+type Props = {
+  tags: string[]
+  data: CollectionEntry<"blog">[]
+}
+
+export default function Blog({ data, tags }: Props) {
+  const [filter, setFilter] = createSignal(new Set<string>())
+  const [posts, setPosts] = createSignal<CollectionEntry<"blog">[]>([])
+
+  createEffect(() => {
+    setPosts(data.filter((entry) => 
+      Array.from(filter()).every((value) => 
+        entry.data.tags.some((tag:string) => 
+          tag.toLowerCase() === String(value).toLowerCase()
+        )
+      )
+    ))
+  })
+
+  function toggleTag(tag: string) {
+    setFilter((prev) => 
+      new Set(prev.has(tag) 
+        ? [...prev].filter((t) => t !== tag) 
+        : [...prev, tag]
+      )
+    )
+  }
+
+  return (
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="col-span-3 sm:col-span-1">
+        <div class="sticky top-24">
+          <div class="text-sm font-semibold uppercase mb-2 text-black dark:text-white">Filter</div>
+          <ul class="flex flex-wrap sm:flex-col gap-1.5">
+            <For each={tags}>
+              {(tag) => (
+                <li>
+                  <button onClick={() => toggleTag(tag)} class={cn("w-full px-2 py-1 rounded", "whitespace-nowrap overflow-hidden overflow-ellipsis", "flex gap-2 items-center", "bg-black/5 dark:bg-white/10", "hover:bg-black/10 hover:dark:bg-white/15", "transition-colors duration-300 ease-in-out", filter().has(tag) && "text-black dark:text-white")}>
+                    <svg class={cn("size-5 fill-black/50 dark:fill-white/50", "transition-colors duration-300 ease-in-out", filter().has(tag) && "fill-black dark:fill-white")}>
+                      <use href={`/ui.svg#square`} class={cn(!filter().has(tag) ? "block" : "hidden")} />
+                      <use href={`/ui.svg#square-check`} class={cn(filter().has(tag) ? "block" : "hidden")} />
+                    </svg>
+                    {tag}
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      </div>
+      <div class="col-span-3 sm:col-span-2">
+        <div class="flex flex-col">
+          <div class="text-sm uppercase mb-2">
+            SHOWING {posts().length} OF {data.length} POSTS
+          </div>
+          <ul class="flex flex-col gap-3">
+            {posts().map((post) => (
+              <li>
+                <ArrowCard entry={post} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/Container.astro">
+---
+import { cn } from "@lib/utils"
+
+type Props = {
+  size: "sm" | "md" | "lg" | "xl" | "2xl"
+}
+
+const { size } = Astro.props;
+---
+
+<div class={cn(
+  "w-full h-full mx-auto px-5",
+  size === "sm" && "max-w-screen-sm",
+  size === "md" && "max-w-screen-md",
+  size === "lg" && "max-w-screen-lg",
+  size === "xl" && "max-w-screen-xl",
+  size === "2xl" && "max-w-screen-2xl",
+)}>
+  <slot/>
+</div>
+</file>
+
+<file path="src/components/Counter.tsx">
+import { createSignal } from "solid-js"
+
+function CounterButton() {
+  const [count, setCount] = createSignal(0)
+
+  const increment = () => setCount(count() + 1)
+
+  return (
+    <div class="flex gap-4 items-center">
+      <button onClick={increment} class="px-3 py-1 border border-black/25 dark:border-white/25 hover:bg-black/5 dark:hover:bg-white/15 blend">
+        Increment
+      </button>
+      <div>
+       Clicked {count()} {count() === 1 ? "time" : "times"}
+      </div>
+    </div>
+
+  )
+}
+
+export default CounterButton
+</file>
+
+<file path="src/components/Drawer.astro">
+---
+import { SITE, LINKS } from "@consts"
+import { cn } from "@lib/utils"
+const { pathname } = Astro.url
+const subpath = pathname.match(/[^/]+/g)
+---
+
+<div id="drawer" class="fixed inset-0 h-0 z-40 overflow-hidden flex flex-col items-center justify-center md:hidden bg-neutral-100 dark:bg-neutral-900 transition-[height] duration-300 ease-in-out">
+  <nav class="flex flex-col items-center space-y-2">
+    {
+      LINKS.map((LINK) => (
+        <a href={LINK.HREF} class={cn("flex items-center justify-center px-3 py-1 rounded-full", "text-current hover:text-black dark:hover:text-white", "hover:bg-black/5 dark:hover:bg-white/20", "transition-colors duration-300 ease-in-out", pathname === LINK.HREF || "/" + subpath?.[0] === LINK.HREF ? "pointer-events-none bg-black dark:bg-white text-white dark:text-black" : "")}>
+          {LINK.TEXT}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="flex gap-1 mt-5">
+    <a href="/search" aria-label={`Search blog posts and projects on ${SITE.TITLE}`} class={cn("size-9 rounded-full p-2 items-center justify-center bg-transparent hover:bg-black/5 dark:hover:bg-white/20 stroke-current hover:stroke-black hover:dark:stroke-white border border-black/10 dark:border-white/25 transition-colors duration-300 ease-in-out", pathname === "/search" || "/" + subpath?.[0] === "search" ? "pointer-events-none bg-black dark:bg-white text-white dark:text-black" : "")}>
+      <svg class="size-full">
+        <use href="/ui.svg#search"></use>
+      </svg>
+    </a>
+
+    <a href="/rss.xml" target="_blank" aria-label={`Rss feed for ${SITE.TITLE}`} class="size-9 rounded-full p-2 items-center justify-center bg-transparent hover:bg-black/5 dark:hover:bg-white/20 stroke-current hover:stroke-black hover:dark:stroke-white border border-black/10 dark:border-white/25 transition-colors duration-300 ease-in-out">
+      <svg class="size-full">
+        <use href="/ui.svg#rss"></use>
+      </svg>
+    </a>
+
+    <button id="drawer-theme-button" aria-label={`Toggle light and dark theme`} class="size-9 rounded-full p-2 items-center justify-center bg-transparent hover:bg-black/5 dark:hover:bg-white/20 stroke-current hover:stroke-black hover:dark:stroke-white border border-black/10 dark:border-white/25 transition-colors duration-300 ease-in-out">
+      <svg class="block dark:hidden size-full">
+        <use href="/ui.svg#sun"></use>
+      </svg>
+      <svg class="hidden dark:block size-full">
+        <use href="/ui.svg#moon"></use>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  #drawer.open {
+    @apply h-full;
+  }
+</style>
+</file>
+
+<file path="src/components/Header.astro">
+---
+import { SITE, LINKS } from "@consts"
+import { cn } from "@lib/utils"
+const { pathname } = Astro.url
+const subpath = pathname.match(/[^/]+/g)
+import Container from "@components/Container.astro"
+---
+
+<header id="header" class="fixed top-0 w-full h-16 z-50 ">
+  <Container size="md">
+    <div class="relative h-full w-full">
+      <div class="absolute left-0 top-1/2 -translate-y-1/2 flex gap-1 font-semibold">
+        <a href="/" class="flex gap-1 text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out">
+          <svg class="size-6 fill-current">
+            <use href="/brand.svg#brand"></use>
+          </svg>
+          <div>
+            {SITE.TITLE}
+          </div>
+        </a>
+      </div>
+
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+      <nav class="hidden md:flex items-center justify-center text-sm gap-1">
+        {
+          LINKS.map((LINK) => (
+            <a href={LINK.HREF} class={cn("h-8 rounded-full px-3 text-current", "flex items-center justify-center", "transition-colors duration-300 ease-in-out", pathname === LINK.HREF || "/" + subpath?.[0] === LINK.HREF ? "bg-black dark:bg-white text-white dark:text-black" : "hover:bg-black/5 dark:hover:bg-white/20 hover:text-black dark:hover:text-white")}>
+              {LINK.TEXT}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="buttons absolute right-0 top-1/2 -translate-y-1/2 flex gap-1">
+      <a href="/search" aria-label={`Search blog posts and projects on ${SITE.TITLE}`} class={cn("hidden md:flex", "size-9 rounded-full p-2 items-center justify-center", "bg-transparent hover:bg-black/5 dark:hover:bg-white/20", "stroke-current hover:stroke-black hover:dark:stroke-white", "border border-black/10 dark:border-white/25", "transition-colors duration-300 ease-in-out", pathname === "/search" || "/" + subpath?.[0] === "/search" ? "pointer-events-none bg-black dark:bg-white text-white dark:text-black" : "")}>
+        <svg class="size-full">
+          <use href="/ui.svg#search"></use>
+        </svg>
+      </a>
+
+      <a href="/rss.xml" target="_blank" aria-label={`Rss feed for ${SITE.TITLE}`} class={cn("hidden md:flex", "size-9 rounded-full p-2 items-center justify-center", "bg-transparent hover:bg-black/5 dark:hover:bg-white/20", "stroke-current hover:stroke-black hover:dark:stroke-white", "border border-black/10 dark:border-white/25", "transition-colors duration-300 ease-in-out")}>
+        <svg class="size-full">
+          <use href="/ui.svg#rss"></use>
+        </svg>
+      </a>
+
+      <button id="header-theme-button" aria-label={`Toggle light and dark theme`} class={cn("hidden md:flex", "size-9 rounded-full p-2 items-center justify-center", "bg-transparent hover:bg-black/5 dark:hover:bg-white/20", "stroke-current hover:stroke-black hover:dark:stroke-white", "border border-black/10 dark:border-white/25", "transition-colors duration-300 ease-in-out")}>
+        <svg class="size-full block dark:hidden">
+          <use href="/ui.svg#sun"></use>
+        </svg>
+        <svg class="size-full hidden dark:block">
+          <use href="/ui.svg#moon"></use>
+        </svg>
+      </button>
+
+      <button id="header-drawer-button" aria-label={`Toggle drawer open and closed`} class={cn("flex md:hidden", "size-9 rounded-full p-2 items-center justify-center", "bg-transparent hover:bg-black/5 dark:hover:bg-white/20", "stroke-current hover:stroke-black hover:dark:stroke-white", "border border-black/10 dark:border-white/25", "transition-colors duration-300 ease-in-out")}>
+        <svg id="drawer-open" class="size-full">
+          <use href="/ui.svg#menu"></use>
+        </svg>
+        <svg id="drawer-close" class="size-full">
+          <use href="/ui.svg#x"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
+  </Container>
+</header>
+
+<style>
+  #header-drawer-button > #drawer-open {
+    @apply block;
+  }
+
+  #header-drawer-button > #drawer-close {
+    @apply hidden;
+  }
+
+  #header-drawer-button.open > #drawer-open {
+    @apply hidden;
+  }
+
+  #header-drawer-button.open > #drawer-close {
+    @apply block;
+  }
+</style>
+
+<script is:inline>
+  function toggleDrawer() {
+    const drawer = document.getElementById("drawer")
+    const drawerButton = document.getElementById("header-drawer-button")
+    drawer?.classList.toggle("open")
+    drawerButton?.classList.toggle("open")
+  }
+
+  function initializeDrawerButton() {
+    const drawerButton = document.getElementById("header-drawer-button")
+    drawerButton?.addEventListener("click", toggleDrawer)
+  }
+
+  document.addEventListener("astro:after-swap", initializeDrawerButton)
+  initializeDrawerButton()
+</script>
+</file>
+
+<file path="src/components/Projects.tsx">
+import type { CollectionEntry } from "astro:content"
+import { createEffect, createSignal, For } from "solid-js"
+import ArrowCard from "@components/ArrowCard"
+import { cn } from "@lib/utils"
+
+type Props = {
+  tags: string[]
+  data: CollectionEntry<"projects">[]
+}
+
+export default function Projects({ data, tags }: Props) {
+  const [filter, setFilter] = createSignal(new Set<string>())
+  const [projects, setProjects] = createSignal<CollectionEntry<"projects">[]>([])
+
+  createEffect(() => {
+    setProjects(data.filter((entry) => 
+      Array.from(filter()).every((value) => 
+        entry.data.tags.some((tag:string) => 
+          tag.toLowerCase() === String(value).toLowerCase()
+        )
+      )
+    ))
+  })
+
+  function toggleTag(tag: string) {
+    setFilter((prev) => 
+      new Set(prev.has(tag) 
+        ? [...prev].filter((t) => t !== tag) 
+        : [...prev, tag]
+      )
+    )
+  }
+
+  return (
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="col-span-3 sm:col-span-1">
+        <div class="sticky top-24">
+          <div class="text-sm font-semibold uppercase mb-2 text-black dark:text-white">Filter</div>
+          <ul class="flex flex-wrap sm:flex-col gap-1.5">
+            <For each={tags}>
+              {(tag) => (
+                <li>
+                  <button onClick={() => toggleTag(tag)} class={cn("w-full px-2 py-1 rounded", "whitespace-nowrap overflow-hidden overflow-ellipsis", "flex gap-2 items-center", "bg-black/5 dark:bg-white/10", "hover:bg-black/10 hover:dark:bg-white/15", "transition-colors duration-300 ease-in-out", filter().has(tag) && "text-black dark:text-white")}>
+                    <svg class={cn("size-5 fill-black/50 dark:fill-white/50", "transition-colors duration-300 ease-in-out", filter().has(tag) && "fill-black dark:fill-white")}>
+                      <use href={`/ui.svg#square`} class={cn(!filter().has(tag) ? "block" : "hidden")} />
+                      <use href={`/ui.svg#square-check`} class={cn(filter().has(tag) ? "block" : "hidden")} />
+                    </svg>
+                    {tag}
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      </div>
+      <div class="col-span-3 sm:col-span-2">
+        <div class="flex flex-col">
+          <div class="text-sm uppercase mb-2">
+            SHOWING {projects().length} OF {data.length} PROJECTS
+          </div>
+          <ul class="flex flex-col gap-3">
+            {projects().map((project) => (
+              <li>
+                <ArrowCard entry={project} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/Publications.tsx">
+import type { CollectionEntry } from "astro:content"
+import { createEffect, createSignal, For } from "solid-js"
+import ArrowCard from "@components/ArrowCard"
+import { cn } from "@lib/utils"
+
+type Props = {
+  tags: string[]
+  data: CollectionEntry<"publications">[]
+}
+
+export default function Publications({ data, tags }: Props) {
+  const [filter, setFilter] = createSignal(new Set<string>())
+  const [publications, setPublications] = createSignal<CollectionEntry<"publications">[]>([])
+
+  createEffect(() => {
+    setPublications(data.filter((entry) => 
+      Array.from(filter()).every((value) => 
+        entry.data.tags.some((tag:string) => 
+          tag.toLowerCase() === String(value).toLowerCase()
+        )
+      )
+    ))
+  })
+
+  function toggleTag(tag: string) {
+    setFilter((prev) => 
+      new Set(prev.has(tag) 
+        ? [...prev].filter((t) => t !== tag) 
+        : [...prev, tag]
+      )
+    )
+  }
+
+  return (
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="col-span-3 sm:col-span-1">
+        <div class="sticky top-24">
+          <div class="text-sm font-semibold uppercase mb-2 text-black dark:text-white">Filter</div>
+          <ul class="flex flex-wrap sm:flex-col gap-1.5">
+            <For each={tags}>
+              {(tag) => (
+                <li>
+                  <button onClick={() => toggleTag(tag)} class={cn("w-full px-2 py-1 rounded", "whitespace-nowrap overflow-hidden overflow-ellipsis", "flex gap-2 items-center", "bg-black/5 dark:bg-white/10", "hover:bg-black/10 hover:dark:bg-white/15", "transition-colors duration-300 ease-in-out", filter().has(tag) && "text-black dark:text-white")}>
+                    <svg class={cn("size-5 fill-black/50 dark:fill-white/50", "transition-colors duration-300 ease-in-out", filter().has(tag) && "fill-black dark:fill-white")}>
+                      <use href={`/ui.svg#square`} class={cn(!filter().has(tag) ? "block" : "hidden")} />
+                      <use href={`/ui.svg#square-check`} class={cn(filter().has(tag) ? "block" : "hidden")} />
+                    </svg>
+                    {tag}
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      </div>
+      <div class="col-span-3 sm:col-span-2">
+        <div class="flex flex-col">
+          <div class="text-sm uppercase mb-2">
+            SHOWING {publications().length} OF {data.length} PUBLICATIONS
+          </div>
+          <ul class="flex flex-col gap-3">
+            {publications().map((publication) => (
+              <li>
+                <ArrowCard entry={publication} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/Search.tsx">
+import type { CollectionEntry } from "astro:content"
+import { createEffect, createSignal } from "solid-js"
+import Fuse from "fuse.js"
+import ArrowCard from "@components/ArrowCard"
+
+type Props = {
+  data: CollectionEntry<"blog">[]
+}
+
+export default function Search({data}: Props) {
+  const [query, setQuery] = createSignal("")
+  const [results, setResults] = createSignal<CollectionEntry<"blog">[]>([])
+
+  const fuse = new Fuse(data, {
+    keys: ["slug", "data.title", "data.summary", "data.tags"],
+    includeMatches: true,
+    minMatchCharLength: 2,
+    threshold: 0.4,
+  })
+
+  createEffect(() => {
+    if (query().length < 2) {
+      setResults([])
+    } else {
+      setResults(fuse.search(query()).map((result) => result.item))
+    }
+  })
+
+  const onInput = (e: Event) => {
+    const target = e.target as HTMLInputElement
+    setQuery(target.value)
+  }
+
+  return (
+    <div class="flex flex-col">
+      <div class="relative">
+        <input name="search" type="text" value={query()} onInput={onInput} autocomplete="off" spellcheck={false} placeholder="What are you looking for?" class="w-full px-2.5 py-1.5 pl-10 rounded outline-none text-black dark:text-white bg-black/5 dark:bg-white/15 border border-black/10 dark:border-white/20 focus:border-black focus:dark:border-white"/>
+        <svg class="absolute size-6 left-1.5 top-1/2 -translate-y-1/2 stroke-current">
+          <use href={`/ui.svg#search`}/>
+        </svg>
+      </div>
+      {(query().length >= 2 && results().length >= 1) && (
+        <div class="mt-12">
+          <div class="text-sm uppercase mb-2">
+            Found {results().length} results for {`'${query()}'`}
+          </div>
+          <ul class="flex flex-col gap-3">
+            {results().map(result => (
+              <li>
+                <ArrowCard entry={result} pill={true} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/StackCard.astro">
+---
+type Props = {
+  text: string
+  icon: string
+  href: string
+}
+
+const { text, icon, href } = Astro.props
+---
+
+<a href={href} target="_blank" class="w-fit px-3 py-2 group rounded border flex gap-2 items-center border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 hover:dark:bg-neutral-800 blend">
+  <svg height={20} width={20}>
+    <use href={`/stack.svg#${icon}`}></use>
+  </svg>
+  <span class="text-sm capitalize text-neutral-500 dark:text-neutral-400 group-hover:text-black group-hover:dark:text-white blend">
+    {text}
+  </span>
+</a>
+</file>
+
+<file path="src/components/Talks.tsx">
+import type { CollectionEntry } from "astro:content"
+import { createEffect, createSignal, For } from "solid-js"
+import ArrowCard from "@components/ArrowCard"
+import { cn } from "@lib/utils"
+
+type Props = {
+  tags: string[]
+  data: CollectionEntry<"talks">[]
+}
+
+export default function Talks({ data, tags }: Props) {
+  const [filter, setFilter] = createSignal(new Set<string>())
+  const [talks, setTalks] = createSignal<CollectionEntry<"talks">[]>([])
+
+  createEffect(() => {
+    setTalks(data.filter((entry) => 
+      Array.from(filter()).every((value) => 
+        entry.data.tags.some((tag:string) => 
+          tag.toLowerCase() === String(value).toLowerCase()
+        )
+      )
+    ))
+  })
+
+  function toggleTag(tag: string) {
+    setFilter((prev) => 
+      new Set(prev.has(tag) 
+        ? [...prev].filter((t) => t !== tag) 
+        : [...prev, tag]
+      )
+    )
+  }
+
+  return (
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="col-span-3 sm:col-span-1">
+        <div class="sticky top-24">
+          <div class="text-sm font-semibold uppercase mb-2 text-black dark:text-white">Filter</div>
+          <ul class="flex flex-wrap sm:flex-col gap-1.5">
+            <For each={tags}>
+              {(tag) => (
+                <li>
+                  <button onClick={() => toggleTag(tag)} class={cn("w-full px-2 py-1 rounded", "whitespace-nowrap overflow-hidden overflow-ellipsis", "flex gap-2 items-center", "bg-black/5 dark:bg-white/10", "hover:bg-black/10 hover:dark:bg-white/15", "transition-colors duration-300 ease-in-out", filter().has(tag) && "text-black dark:text-white")}>
+                    <svg class={cn("size-5 fill-black/50 dark:fill-white/50", "transition-colors duration-300 ease-in-out", filter().has(tag) && "fill-black dark:fill-white")}>
+                      <use href={`/ui.svg#square`} class={cn(!filter().has(tag) ? "block" : "hidden")} />
+                      <use href={`/ui.svg#square-check`} class={cn(filter().has(tag) ? "block" : "hidden")} />
+                    </svg>
+                    {tag}
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      </div>
+      <div class="col-span-3 sm:col-span-2">
+        <div class="flex flex-col">
+          <div class="text-sm uppercase mb-2">
+            SHOWING {talks().length} OF {data.length} TALKS
+          </div>
+          <ul class="flex flex-col gap-3">
+            {talks().map((talk) => (
+              <li>
+                <ArrowCard entry={talk} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/layouts/BottomLayout.astro">
+---
+import Container from "@components/Container.astro"
+---
+
+<div class="flex-1 py-5">
+  <Container size="md">
+    <slot/>
+  </Container>
+</div>
+</file>
+
+<file path="src/layouts/TopLayout.astro">
+---
+import Container from "@components/Container.astro"
+---
+
+<div class="pt-36 pb-5">
+  <Container size="md">
+    <slot/>
+  </Container>
+</div>
+</file>
+
+<file path="src/lib/utils.ts">
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+export function formatDate(date: Date) {
+  return Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  }).format(date)
+}
+
+export function readingTime(html: string) {
+  const textOnly = html.replace(/<[^>]+>/g, "")
+  const wordCount = textOnly.split(/\s+/).length
+  const readingTimeMinutes = ((wordCount / 200) + 1).toFixed()
+  return `${readingTimeMinutes} min read`
+}
+</file>
+
+<file path="src/pages/blog/personal/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Blog from "@components/Blog"
+import { PERSONAL_BLOG } from "@consts"
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft && post.data.category === "personal")
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))]
+  .sort((a, b) => a.localeCompare(b)) as string[]
+
+// Get the first post with a thumbnail for the Open Graph image
+const firstPostWithThumbnail = posts.find(post => post.data.thumbnail)
+const imagePath = firstPostWithThumbnail?.data.thumbnail
+  ? `/content/blog/${firstPostWithThumbnail.slug}/${firstPostWithThumbnail.data.thumbnail}`
+  : undefined
+---
+
+<PageLayout title={PERSONAL_BLOG.TITLE} description={PERSONAL_BLOG.DESCRIPTION} image={imagePath}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {PERSONAL_BLOG.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Blog client:load tags={tags} data={posts} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/blog/tech/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Blog from "@components/Blog"
+import { TECH_BLOG } from "@consts"
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft && post.data.category === "tech")
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))]
+  .sort((a, b) => a.localeCompare(b)) as string[]
+
+// Get the first post with a thumbnail for the Open Graph image
+const firstPostWithThumbnail = posts.find(post => post.data.thumbnail)
+const imagePath = firstPostWithThumbnail?.data.thumbnail
+  ? `/content/blog/${firstPostWithThumbnail.slug}/${firstPostWithThumbnail.data.thumbnail}`
+  : undefined
+---
+
+<PageLayout title={TECH_BLOG.TITLE} description={TECH_BLOG.DESCRIPTION} image={imagePath}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {TECH_BLOG.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Blog client:load tags={tags} data={posts} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/legal/[...slug].astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import { formatDate } from "@lib/utils"
+import { SITE } from "@consts"
+
+// Create the static pages for legal docs
+export async function getStaticPaths() {
+	const docs = await getCollection("legal")
+	return docs.map((doc) => ({
+		params: { slug: doc.slug },
+		props: doc,
+	}))
+}
+
+// Get the requested legal doc
+type Props = CollectionEntry<"legal">;
+const doc = Astro.props
+const { title, date } = doc.data
+const { Content } = await doc.render();
+
+---
+
+<PageLayout title={title} description={`${title} for ${SITE.TITLE}`}>
+  <TopLayout>
+    <div class="animate">
+      <div class="page-heading">
+        {title}
+      </div>
+      <p class="font-normal opacity-75">
+        Last updated: {formatDate(date)}
+      </p>
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <article class="animate">
+      <Content/>
+    </article>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/search/index.astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Search from "@components/Search"
+import { SEARCH } from "@consts"
+
+const posts = (await getCollection("blog"))
+  .filter(post => !post.data.draft)
+
+const projects = (await getCollection("projects"))
+  .filter(post => !post.data.draft)
+
+const data = [...posts, ...projects] as CollectionEntry<"blog">[]
+---
+
+<PageLayout title={SEARCH.TITLE} description={SEARCH.DESCRIPTION}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {SEARCH.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Search client:load data={data}/>
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/work/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import { WORK } from "@consts"
+
+const collection = await getCollection("work")
+
+collection.sort((a, b) => new Date(b.data.dateStart).getTime() - new Date(a.data.dateStart).getTime())
+
+const work = await Promise.all(
+  collection.map(async (item) => {
+    const { Content } = await item.render()
+    return { ...item, Content }
+  })
+)
+
+function formatWorkDate(input: Date | string) {
+  if (typeof input === "string") return input
+
+  const month = input.toLocaleDateString("en-US", {
+    month: "short",
+  })
+
+  const year = new Date(input).getFullYear()
+  return `${month} ${year}`
+}
+---
+
+<PageLayout title={WORK.TITLE} description={WORK.DESCRIPTION}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {WORK.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <ul>
+      { 
+        work.map((entry) => (
+          <li class="animate border-b border-black/10 dark:border-white/25 mt-4 py-8 first-of-type:mt-0 first-of-type:pt-0 last-of-type:border-none">
+            <div class="text-sm uppercase mb-4">
+              {formatWorkDate(entry.data.dateStart)} - {formatWorkDate(entry.data.dateEnd)}
+            </div>
+            <div class="text-black dark:text-white font-semibold">
+              {entry.data.company}
+            </div>
+            <div class="text-sm font-semibold">
+              {entry.data.role}
+            </div>
+            <article class="prose dark:prose-invert">
+              <entry.Content />
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/robots.txt.ts">
+import type { APIRoute } from "astro"
+
+const robotsTxt = `
+User-agent: *
+Allow: /
+
+Sitemap: ${new URL("sitemap-index.xml", import.meta.env.SITE).href}
+`.trim()
+
+export const GET: APIRoute = () => {
+  return new Response(robotsTxt, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+    },
+  })
+}
+</file>
+
+<file path="src/pages/rss.xml.ts">
+import rss from "@astrojs/rss"
+import { getCollection } from "astro:content"
+import { SITE } from "@consts"
+
+type Context = {
+  site: string
+}
+
+export async function GET(context: Context) {
+	const posts = await getCollection("blog")
+  const projects = await getCollection("projects")
+
+  const items = [...posts, ...projects]
+
+  items.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+
+  return rss({
+    title: SITE.TITLE,
+    description: SITE.DESCRIPTION,
+    site: context.site,
+    items: items.map((item) => ({
+      title: item.data.title,
+      description: item.data.summary,
+      pubDate: item.data.date,
+      link: item.slug.startsWith("blog")
+        ? `/blog/${item.slug}/`
+        : `/projects/${item.slug}/`,
+    })),
+  })
+}
+</file>
+
+<file path="src/pages/thank-you.astro">
+---
+import PageLayout from "@layouts/PageLayout.astro"
+
+const title = "Thank You"
+const description = "Thank you for your message"
+---
+
+<PageLayout title={title} description={description}>
+  <div class="relative bg-white dark:bg-black min-h-screen">
+    <div class="mx-auto max-w-screen-sm p-5">
+      <section class="animate py-16 text-center">
+        <h1 class="text-3xl font-bold mb-4 text-black dark:text-white">
+          Thank You!
+        </h1>
+        <p class="mb-8 text-black/75 dark:text-white/75">
+          Your message has been sent successfully. I'll get back to you as soon as possible.
+        </p>
+        <a 
+          href="/"
+          class="inline-block py-2 px-4 rounded bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
+        >
+          Return Home
+        </a>
+      </section>
+    </div>
+  </div>
+</PageLayout>
+</file>
+
+<file path="src/env.d.ts">
+/// <reference path="../.astro/types.d.ts" />
+/// <reference types="astro/client" />
+</file>
+
+<file path="src/types.ts">
+export type Page = {
+  TITLE: string
+  DESCRIPTION: string
+}
+
+export interface Site extends Page {
+  AUTHOR: string
+}
+
+export type Links = {
+  TEXT: string
+  HREF: string
+}[]
+
+export type Socials = {
+  NAME: string
+  ICON: string
+  TEXT: string
+  HREF: string
+}[]
+</file>
+
+<file path="LICENSE">
+MIT License
+
+Copyright (c) 2024 Mark Horn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</file>
+
+<file path="vite.config.ts">
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    assetsInlineLimit: 0,
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
+  },
+});
+</file>
+
+<file path="src/components/Footer.astro">
+---
+import { SITE, SOCIALS } from "@consts"
+import Container from "@components/Container.astro"
+---
+
+<footer class="relative bg-white dark:bg-black">
+  <div class="animate">
+    <section class="py-5">
+      <Container size="md">
+        <div class="flex items-center justify-center sm:justify-end">
+          <button id="back-to-top" aria-label="Back to top of page" class="group flex w-fit p-1.5 gap-1.5 text-sm items-center border rounded hover:bg-black/5 hover:dark:bg-white/10 border-black/15 dark:border-white/20 transition-colors duration-300 ease-in-out">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="stroke-current group-hover:stroke-black group-hover:dark:stroke-white rotate-90">
+              <line x1="19" y1="12" x2="5" y2="12" class="scale-x-0 group-hover:scale-x-100 translate-x-3 group-hover:translate-x-0 transition-all duration-300 ease-in-out" />
+              <polyline points="12 19 5 12 12 5" class="translate-x-1 group-hover:translate-x-0 transition-all duration-300 ease-in-out" />
+            </svg>
+            <div class="w-full group-hover:text-black group-hover:dark:text-white transition-colors duration-300 ease-in-out">
+              Back to top
+            </div>
+          </button>
+        </div>
+      </Container>
+    </section>
+  
+    <section class=" py-5 overflow-hidden whitespace-nowrap border-t border-black/10 dark:border-white/25">
+      <Container size="md">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="flex flex-col items-center sm:items-start">
+            <a href="/" class="flex gap-1 w-fit font-semibold text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out">
+              <svg class="size-6 fill-current">
+                <use href="/brand.svg#brand"/>
+              </svg>
+              {SITE.TITLE}
+            </a>
+          </div>
+          <div class="flex gap-2 justify-center sm:justify-end items-center">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+            All systems normal
+          </div>
+        </div>
+      </Container>
+    </section>
+  
+    <section class=" py-5 overflow-hidden whitespace-nowrap border-t border-black/10 dark:border-white/25">
+      <Container size="md">
+        <div class="h-full grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="order-2 sm:order-1 flex flex-col items-center justify-center sm:items-start">
+            <!-- <div class="legal">
+              <a href="/legal/terms" class="text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out">
+                Terms
+              </a> |
+              <a href="/legal/privacy" class="text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out">
+                Privacy
+              </a>
+            </div> -->
+            <div class="text-sm mt-2">
+              &copy; 2024 | All rights reserved
+            </div>
+          </div>
+  
+          <!-- <div class="order-1 sm:order-2 flex justify-center sm:justify-end">
+            <div class="flex flex-wrap gap-1 items-center justify-center">
+              {
+                SOCIALS.map((SOCIAL) => (
+                  <a 
+                    href={SOCIAL.HREF} 
+                    target="_blank" 
+                    aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`} 
+                    class="group size-10 rounded-full p-2 items-center justify-center hover:bg-black/5 dark:hover:bg-white/20  blend"
+                  >
+                    <svg class="size-full fill-current group-hover:fill-black group-hover:dark:fill-white blend">
+                      <use href={`/social.svg#${SOCIAL.ICON}`} />
+                    </svg>
+                  </a>
+                ))
+              }
+              </div>
+          </div> -->
+        </div>
+      </Container>
+    </section>
+  </div>
+
+</footer>
+
+<script is:inline>
+  function goBackToTop(event) {
+    event.preventDefault()
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    })
+  }
+
+  function inintializeBackToTop() {
+    const backToTop = document.getElementById("back-to-top")
+    backToTop?.addEventListener("click", goBackToTop)
+  }
+
+  document.addEventListener("astro:after-swap", inintializeBackToTop)
+  inintializeBackToTop()
+</script>
+</file>
+
+<file path="src/components/MeteorShower.astro">
+---
+/**
+ * Meteors.astro
+ * This component creates meteors that are appended to the galaxy on interval.
+ * Meteors are removed from the document after the animation is completed.
+ * There are four (4) meteor shower containers, one for each diagonal direction.
+ */
+---
+
+<div id="meteors">
+  <!-- rotations defined in base.css & tailwind.config.mjs -->
+  <div class="shower ur" />
+  <div class="shower dr" /> 
+  <div class="shower dl" />
+  <div class="shower ul" />
+</div>
+
+<script>
+  function createMeteor () {
+  // create a meteor
+  let meteor = document.createElement("div");
+  meteor.setAttribute("class", "meteor");
+  meteor.style.left = Math.round(Math.random() * window.innerWidth) + "px";
+  meteor.style.top  = Math.round(Math.random() * window.innerHeight) + "px";
+  
+  // append the meteor to a random meteor shower (direction)
+  const showers = document.querySelectorAll(".shower");
+  if (showers.length > 0) {
+    const random = Math.floor(Math.random() * showers.length);
+    const shower = showers[random];
+    shower.append(meteor);
+  }
+
+  // remove the meteor after the animation duration
+  setTimeout(() => {
+    meteor.remove();
+  }, 3500);
+}
+
+// Create meteors on interval on two (2) seconds
+setInterval(createMeteor, 1500);
+</script>
+</file>
+
+<file path="src/components/TwinklingStars.astro">
+---
+/**
+ * TwinkleStars.astro
+ * This component creates twinkling stars that are appended to the galaxy on interval.
+ * Twinkle stars are removed from the document after the animation is completed.
+ * The svg below is just a template for the script to clone and append to the galaxy.
+ */
+---
+
+<svg 
+  id="twinkle-star" 
+  class="template" 
+  width="149" 
+  height="149" 
+  viewBox="0 0 149 149" 
+  fill="none" 
+  xmlns="http://www.w3.org/2000/svg"
+  class="absolute left-full animate-twinkle"
+>
+  <circle cx="74" cy="74" r="11" fill="white"/>
+  <rect y="141.421" width="200" height="10" transform="rotate(-45 0 141.421)" fill="url(#paint0_linear_4_2)"/>
+  <rect x="7.07107" width="200" height="10" transform="rotate(45 7.07107 0)" fill="url(#paint1_linear_4_2)"/>
+  <defs>
+    <linearGradient id="paint0_linear_4_2" x1="0" y1="146.421" x2="200" y2="146.421" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E1E1E"/>
+      <stop offset="0.445" stop-color="white"/>
+      <stop offset="0.58721" stop-color="white"/>
+      <stop offset="1" stop-color="#1E1E1E"/>
+    </linearGradient>
+    <linearGradient id="paint1_linear_4_2" x1="7.07107" y1="5" x2="207.071" y2="5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E1E1E"/>
+      <stop offset="0.42" stop-color="white"/>
+      <stop offset="0.555" stop-color="white"/>
+      <stop offset="1" stop-color="#1E1E1E"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<script is:inline>
+  // Generate a twinkle star and append it to the galaxy, remove it after animation.
+  function generateTwinkleStar() {
+    const twinkleStarTemplate = document.getElementById("twinkle-star")
+    if (!twinkleStarTemplate) { return; }
+    // Clone the twinkle star template and set its attributes.
+    const twinkleStar = twinkleStarTemplate.cloneNode(true);
+    twinkleStar.style.position = "absolute";
+    twinkleStar.style.left = Math.floor(Math.random() * window.innerWidth) + "px";
+    twinkleStar.style.top = Math.floor(Math.random() * (window.innerHeight/3)) + "px";
+    twinkleStar.style.width = window.innerWidth < 768 ? Math.floor(Math.random() * (15 - 7.5 + 1) + 7.5) : Math.floor(Math.random() * (30 - 15 + 1) + 15) + "px";
+    twinkleStar.style.height = twinkleStar.style.width;
+    twinkleStar.classList.add("twinkle");
+    document.getElementById("galaxy").appendChild(twinkleStar);
+
+    // Remove the twinkle star after the animation is completed.
+    setTimeout(() => {
+      twinkleStar.remove();
+    }, 2500);
+  }
+
+  setInterval(generateTwinkleStar, 5000);
+</script>
+</file>
+
+<file path="src/layouts/PageLayout.astro">
+---
+import "@styles/global.css"
+import BaseHead from "@components/BaseHead.astro"
+import Header from "@components/Header.astro"
+import Footer from "@components/Footer.astro"
+import Drawer from "@components/Drawer.astro"
+const { title, description, image } = Astro.props
+import { SITE } from "@consts"
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`${title} | ${SITE.TITLE}`} description={description} image={image} />
+  </head>
+  <body>
+    <Header />
+    <Drawer />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+</file>
+
+<file path="src/pages/blog/[...slug].astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import ArticleTopLayout from "@layouts/ArticleTopLayout.astro"
+import ArticleBottomLayout from "@layouts/ArticleBottomLayout.astro"
+
+// Create the static blog pages
+export async function getStaticPaths() {
+	const posts = await getCollection("blog")
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: post,
+	}))
+}
+
+// Get the requested post
+type Props = CollectionEntry<"blog">
+const post = Astro.props
+const { title, summary, thumbnail } = post.data
+
+// Construct the image path if thumbnail exists
+const imagePath = thumbnail
+  ? `/content/blog/${post.slug}/${thumbnail}`
+  : undefined
+---
+
+<PageLayout title={title} description={summary} image={imagePath}>
+  <TopLayout>
+    <div class="animate">
+      <ArticleTopLayout entry={post}/>
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <ArticleBottomLayout entry={post} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/blog/index.astro">
+---
+// Redirect to tech blog by default
+export const prerender = false;
+
+const techBlogUrl = "/blog/tech";
+
+export function GET() {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      'Location': techBlogUrl
+    }
+  });
+}
+---
+</file>
+
+<file path="src/pages/projects/[...slug].astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import ArticleTopLayout from "@layouts/ArticleTopLayout.astro"
+import ArticleBottomLayout from "@layouts/ArticleBottomLayout.astro"
+
+// Create the static projects pages
+export async function getStaticPaths() {
+	const projects = await getCollection("projects")
+	return projects.map((project) => ({
+		params: { slug: project.slug },
+		props: project,
+	}))
+}
+
+// Get the requested project
+type Props = CollectionEntry<"projects">
+const project = Astro.props
+const { title, summary, thumbnail } = project.data
+
+// Construct the image path if thumbnail exists
+const imagePath = thumbnail
+  ? `/content/projects/${project.slug}/${thumbnail}`
+  : undefined
+---
+
+<PageLayout title={title} description={summary} image={imagePath}>
+  <TopLayout>
+    <div class="animate">
+      <ArticleTopLayout entry={project} />
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <ArticleBottomLayout entry={project} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/projects/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Projects from "@components/Projects"
+import { PROJECTS } from "@consts"
+
+const projects = (await getCollection("projects"))
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const tags = [...new Set(projects.flatMap(project => project.data.tags))]
+  .sort((a, b) => a.localeCompare(b))
+
+// Get the first project with a thumbnail for the Open Graph image
+const firstProjectWithThumbnail = projects.find(project => project.data.thumbnail)
+const imagePath = firstProjectWithThumbnail?.data.thumbnail
+  ? `/content/projects/${firstProjectWithThumbnail.slug}/${firstProjectWithThumbnail.data.thumbnail}`
+  : undefined
+---
+
+<PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION} image={imagePath}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {PROJECTS.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Projects client:load tags={tags} data={projects} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/publications/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Publications from "@components/Publications"
+import { PUBLICATIONS } from "@consts"
+
+const publications = (await getCollection("publications"))
+  .filter(publication => !publication.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const tags = [...new Set(publications.flatMap(publication => publication.data.tags))]
+  .sort((a, b) => a.localeCompare(b))
+
+// Get the first publication with a thumbnail for the Open Graph image
+const firstPublicationWithThumbnail = publications.find(publication => publication.data.thumbnail)
+const imagePath = firstPublicationWithThumbnail?.data.thumbnail
+  ? `/content/publications/${firstPublicationWithThumbnail.slug}/${firstPublicationWithThumbnail.data.thumbnail}`
+  : undefined
+---
+
+<PageLayout title={PUBLICATIONS.TITLE} description={PUBLICATIONS.DESCRIPTION} image={imagePath}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {PUBLICATIONS.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Publications client:load tags={tags} data={publications} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/talks/[...slug].astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import ArticleTopLayout from "@layouts/ArticleTopLayout.astro"
+import ArticleBottomLayout from "@layouts/ArticleBottomLayout.astro"
+
+// Create the static talks pages
+export async function getStaticPaths() {
+    const talks = await getCollection("talks")
+    return talks.map((talk) => ({
+        params: { slug: talk.slug },
+        props: { entry: talk }, // Change this line to pass entry explicitly
+    }))
+}
+
+// Get the requested talk
+interface Props {
+    entry: CollectionEntry<"talks">
+}
+
+const { entry: talk } = Astro.props;
+const { title, summary, thumbnail } = talk.data
+
+// Construct the image path if thumbnail exists
+const imagePath = thumbnail
+  ? `/content/talks/${talk.slug}/${thumbnail}`
+  : undefined
+---
+
+<PageLayout title={title} description={summary} image={imagePath}>
+  <TopLayout>
+    <div class="animate">
+      <ArticleTopLayout entry={talk} />
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <ArticleBottomLayout entry={talk} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/talks/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import Talks from "@components/Talks"
+import { TALKS } from "@consts"
+
+const talks = (await getCollection("talks"))
+  .filter(talk => !talk.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const tags = [...new Set(talks.flatMap(talk => talk.data.tags))]
+  .sort((a, b) => a.localeCompare(b))
+
+// Get the first talk with a thumbnail for the Open Graph image
+const firstTalkWithThumbnail = talks.find(talk => talk.data.thumbnail)
+const imagePath = firstTalkWithThumbnail?.data.thumbnail
+  ? `/content/talks/${firstTalkWithThumbnail.slug}/${firstTalkWithThumbnail.data.thumbnail}`
+  : undefined
+---
+
+<PageLayout title={TALKS.TITLE} description={TALKS.DESCRIPTION} image={imagePath}>
+  <TopLayout>
+    <div class="animate page-heading">
+      {TALKS.TITLE}
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <Talks client:load tags={tags} data={talks} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="src/pages/contact.astro">
+---
+import PageLayout from "@layouts/PageLayout.astro"
+
+const title = "Get in Touch"
+const description = "Send me a message - I'd love to hear from you!"
+---
+
+<PageLayout title={title} description={description}>
+  <div class="relative bg-white dark:bg-black min-h-screen">
+    <div class="mx-auto max-w-screen-sm p-5">
+      <section class="animate py-16">
+        <h1 class="text-3xl font-bold mb-8 text-center text-black dark:text-white">
+          Get in Touch
+        </h1>
+        
+        <form 
+          action="https://formsubmit.co/mireklzicar@seznam.cz" 
+          method="POST"
+          class="space-y-6 max-w-xl mx-auto"
+        >
+          <!-- Honeypot -->
+          <input type="text" name="_honey" style="display:none">
+          
+          <!-- Disable Captcha -->
+          <input type="hidden" name="_captcha" value="false">
+          
+          <!-- Success Page -->
+          <input type="hidden" name="_next" value="https://mireklzicar.com/thank-you">
+
+          <div>
+            <label for="name" class="block text-sm font-medium text-black/75 dark:text-white/75 mb-2">
+              Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value="John Doe"
+              id="name"
+              required
+              class="w-full px-4 py-2 rounded-md border border-black/10 dark:border-white/10 bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50"
+            />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-black/75 dark:text-white/75 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value="john@doe.com"
+              id="email"
+              required
+              class="w-full px-4 py-2 rounded-md border border-black/10 dark:border-white/10 bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50"
+            />
+          </div>
+
+          <div>
+            <label for="subject" class="block text-sm font-medium text-black/75 dark:text-white/75 mb-2">
+              Subject
+            </label>
+            <input
+              type="text"
+              name="subject"
+              value="Just saying hi!"
+              id="subject"
+              required
+              class="w-full px-4 py-2 rounded-md border border-black/10 dark:border-white/10 bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50"
+            />
+          </div>
+
+          <div>
+            <label for="message" class="block text-sm font-medium text-black/75 dark:text-white/75 mb-2">
+              Message
+            </label>
+            <textarea
+              name="message"
+              id="message"
+              rows="6"
+              required
+              class="w-full px-4 py-2 rounded-md border border-black/10 dark:border-white/10 bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50"
+            >Hi Miroslav,
+
+Let's connect! I'd love to chat how we can collaborate.
+            
+Best Regards,
+John</textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3 px-4 rounded text-white dark:text-black bg-black dark:bg-white hover:opacity-90 transition-opacity font-medium"
+          >
+            Send Message
+          </button>
+        </form>
+      </section>
+    </div>
+  </div>
+</PageLayout>
+</file>
+
+<file path=".gitignore">
+# build output
+dist/
+
+public/content/*
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+</file>
+
+<file path="tailwind.config.mjs">
+import defaultTheme from "tailwindcss/defaultTheme"
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: ["class"],
+  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+  theme: {
+    extend: {
+      fontFamily: {
+        "sans": ["Atkinson", ...defaultTheme.fontFamily.sans],
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "full",
+          },
+        },
+      },
+      rotate: {
+        "45": "45deg",
+        "135": "135deg",
+        "225": "225deg",
+        "315": "315deg",
+      },
+      animation: {
+        twinkle: "twinkle 2s ease-in-out forwards",
+        meteor: "meteor 3s ease-in-out forwards",
+      },
+      keyframes: {
+        twinkle: {
+          "0%": { 
+            opacity: 0, 
+            transform: "rotate(0deg)" 
+          },
+          "50%": { 
+            opacity: 1,
+            transform: "rotate(180deg)" 
+          },
+          "100%": { 
+            opacity: 0, 
+            transform: "rotate(360deg)" 
+          },
+        },
+        meteor: {
+          "0%": { 
+            opacity: 0, 
+            transform: "translateY(200%)" 
+          },
+          "50%": { 
+            opacity: 1  
+          },
+          "100%": { 
+            opacity: 0, 
+            transform: "translateY(0)" 
+          },
+        },
+      },
+    },
+  },
+  plugins: [require("@tailwindcss/typography")],
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@*": [
+        "src/*"
+      ]
+    },
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.astro"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
+</file>
+
+<file path="src/styles/global.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Atkinson";
+    src: url("/fonts/atkinson-regular.woff") format("woff");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Atkinson";
+    src: url("/fonts/atkinson-bold.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+}
+
+html {
+  overflow-y: scroll;
+  color-scheme: light;
+  background-color: white;
+  font-family: "Atkinson", sans-serif;
+  
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: black;
+}
+
+html,
+body {
+  @apply h-full w-full antialiased;
+  @apply bg-white dark:bg-black;
+  @apply text-black/75 dark:text-white/75;
+}
+
+body {
+  @apply relative flex flex-col;
+}
+
+main {
+  @apply flex flex-col flex-1 bg-white dark:bg-black;
+}
+
+header {
+  @apply border-b;
+  @apply transition-all duration-300 ease-in-out;
+}
+
+header:not(.scrolled) {
+  @apply bg-transparent border-transparent;
+}
+
+header.scrolled {
+  @apply bg-white/75 dark:bg-black/50;
+  @apply border-black/10 dark:border-white/25;
+  @apply backdrop-blur-sm saturate-200;
+}
+
+article {
+  @apply prose dark:prose-invert max-w-full pb-12;
+}
+
+.page-heading {
+  @apply font-semibold text-black dark:text-white;
+}
+
+.blend {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/** Light theme particles on home page */
+@keyframes animateParticle {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
+/** styles for public /animation.js */
+.animate {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.animate.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+article img {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Table of Contents
+ */
+.toc-container {
+  @apply bg-white/50 dark:bg-black/50;
+  @apply backdrop-blur-sm;
+}
+
+.toc-container ul {
+  @apply list-none p-0 m-0;
+}
+
+.toc-item {
+  @apply py-1;
+}
+
+.toc-level-1 {
+  @apply font-semibold;
+}
+
+.toc-level-2 {
+  @apply text-sm;
+}
+
+.toc-level-3 {
+  @apply text-xs opacity-80;
+}
+
+/**
+ * TWINKLE STARS
+ */
+
+ #twinkle-star.template {
+  @apply absolute -left-full; /* hide offscreen */
+}
+
+#twinkle-star.twinkle {
+  @apply animate-twinkle; /* defined in tailwind.config */
+}
+
+
+/**
+ * Meteors
+ */
+
+#meteors .shower {
+  @apply absolute inset-0 top-0;;
+  @apply left-1/2 -translate-x-1/2;
+  @apply w-screen aspect-square;
+}
+
+#meteors .meteor {
+  @apply animate-meteor; /* defined in tailwind.config */
+  @apply absolute top-1/2 left-1/2 w-px h-[75vh];
+  @apply bg-gradient-to-b from-white to-transparent;
+}
+
+#meteors .shower.ur {
+  @apply rotate-45;
+}
+
+#meteors .shower.dr {
+  @apply rotate-135;
+}
+
+#meteors .shower.dl {
+  @apply rotate-225;
+}
+
+#meteors .shower.ul {
+  @apply rotate-315;
+}
+</file>
+
+<file path="src/pages/publications/[...slug].astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import TopLayout from "@layouts/TopLayout.astro"
+import BottomLayout from "@layouts/BottomLayout.astro"
+import ArticleTopLayout from "@layouts/ArticleTopLayout.astro"
+import ArticleBottomLayout from "@layouts/ArticleBottomLayout.astro"
+
+// Create the static publications pages
+export async function getStaticPaths() {
+    const publications = await getCollection("publications")
+    return publications.map((publication) => ({
+        params: { slug: publication.slug },
+        props: { entry: publication }, // Change this line to pass entry explicitly
+    }))
+}
+
+// Get the requested publication
+interface Props {
+    entry: CollectionEntry<"publications">
+}
+
+const { entry: publication } = Astro.props;
+const { title, summary, thumbnail } = publication.data
+
+// Construct the image path if thumbnail exists
+const imagePath = thumbnail
+  ? `/content/publications/${publication.slug}/${thumbnail}`
+  : undefined
+---
+
+<PageLayout title={title} description={summary} image={imagePath}>
+  <TopLayout>
+    <div class="animate">
+      <ArticleTopLayout entry={publication} />
+    </div>
+  </TopLayout>
+  <BottomLayout>
+    <div class="animate">
+      <ArticleBottomLayout entry={publication} />
+    </div>
+  </BottomLayout>
+</PageLayout>
+</file>
+
+<file path="README.md">
+Astro Sphere is a static, minimalist, lightweight, lightning fast portfolio and blog theme based on my personal website.
+
+It is primarily Astro, Tailwind and Typescript, with a very small amount of SolidJS for stateful components.
+
+
+## 📋 Features
+
+- ✅ 100/100 Lighthouse performance
+- ✅ Responsive
+- ✅ Accessible
+- ✅ SEO-friendly
+- ✅ Typesafe
+- ✅ Minimal style
+- ✅ Light/Dark Theme
+- ✅ Animated UI
+- ✅ Tailwind styling
+- ✅ Auto generated sitemap
+- ✅ Auto generated RSS Feed
+- ✅ Markdown support
+- ✅ MDX Support (components in your markdown)
+- ✅ Searchable content (posts and projects)
+
+
+## 🕊️ Lightweight
+All pages under 100kb (including fonts)
+
+## ⚡︎ Fast
+Rendered in ~40ms on localhost
+
+## 📄 Configuration
+
+The blog posts on the demo serve as the documentation and configuration.
+
+## 💻 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+Replace npm with your package manager of choice. `npm`, `pnpm`, `yarn`, `bun`, etc
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
+| `npm run dev:network`     | Starts dev server on local network               |
+| `npm run sync`            | Generates TypeScript types for all Astro modules.|
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run preview:network` | Starts preview server on local network           |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| `npm run lint`            | Run ESLint                                       |
+| `npm run lint:fix`        | Auto-fix ESLint issues                           |
+
+## 🗺️ Roadmap
+
+A few features I plan to implement
+- ⬜ Code Blocks - copy to clipboard
+- ⬜ Article Pages - Table of Contents
+- ⬜ Article Pages - Share on social media
+
+## ✨ Acknowledgement
+
+Theme inspired by [Paco Coursey](https://paco.me/), [Lee Robinson](https://leerob.io/) and [Hayden Bleasel](https://www.haydenbleasel.com/)
+
+
+## 🏛️ License
+
+MIT
+
+
+# 1.0.1 Update
+
+Added ability to run dev and preview on local network.
+added npm run dev:network
+added npm run preview:network
+
+Added slightly more particle density in both light and dark mode.
+
+Added subtle dark mode star and meteor animations.
+
+Removed eslint config
+</file>
+
+<file path="src/components/BaseHead.astro">
+---
+
+interface Props {
+  title: string
+  description: string
+  image?: string
+}
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+
+const { title, description, image = "/open-graph.jpg" } = Astro.props
+---
+
+<!-- Global Metadata -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+<meta name="generator" content={Astro.generator} />
+
+<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin>
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.url)} />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={Astro.url} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={new URL(image, Astro.url)} />
+
+<!-- Sitemap -->
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+<!-- RSS Feed -->
+<link rel="alternate" type="application/rss+xml" title={title} href={`${Astro.site}rss.xml`}/>
+
+<!-- Global Scripts -->
+<script is:inline src="/js/theme.js"></script>
+<script is:inline src="/js/scroll.js"></script>
+<script is:inline src="/js/animate.js"></script>
+
+<!-- Google Analytics -->
+<script is:inline type="text/partytown" async src="https://www.googletagmanager.com/gtag/js?id=G-KH5NXR3L16"></script>
+<script is:inline type="text/partytown">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KH5NXR3L16');
+</script>
+
+<!-- <ViewTransitions  /> -->
+
+<script>
+  import type { TransitionBeforeSwapEvent } from "astro:transitions/client"
+  document.addEventListener("astro:before-swap", (e) =>
+    [
+      ...(e as TransitionBeforeSwapEvent).newDocument.head.querySelectorAll(
+        "link[as=\"font\"]"
+      ),
+    ].forEach((link) => link.remove())
+  )
+</script>
+</file>
+
+<file path="src/consts.ts">
+import type { Site, Page, Links, Socials } from "@types"
+
+// Global
+export const SITE: Site = {
+  TITLE: "Miroslav Lžičař",
+  DESCRIPTION: "Welcome to personal website of Miroslav Lzicar – CTO and Co-Founder of Deep MedChem.",
+  AUTHOR: "Miroslav Lzicar",
+}
+
+// Work Page
+export const WORK: Page = {
+  TITLE: "Work",
+  DESCRIPTION: "Places I have worked.",
+}
+
+// Blog Pages
+export const BLOG: Page = {
+  TITLE: "Blog",
+  DESCRIPTION: "Writing on topics I am passionate about.",
+}
+
+export const TECH_BLOG: Page = {
+  TITLE: "Tech",
+  DESCRIPTION: "Writing on technical topics and research.",
+}
+
+export const PERSONAL_BLOG: Page = {
+  TITLE: "Culture",
+  DESCRIPTION: "Writing on personal interests and thoughts.",
+}
+
+export const PUBLICATIONS: Page = {
+  TITLE: "Publications",
+  DESCRIPTION: "Recent publications I have worked on.",
+}
+
+export const TALKS: Page = {
+  TITLE: "Talks",
+  DESCRIPTION: "Recent talks where I have been.",
+}
+
+
+
+// Projects Page 
+export const PROJECTS: Page = {
+  TITLE: "Projects",
+  DESCRIPTION: "Recent projects I have worked on.",
+}
+
+// Search Page
+export const SEARCH: Page = {
+  TITLE: "Search",
+  DESCRIPTION: "Search all posts and projects by keyword.",
+}
+
+// Links
+export const LINKS: Links = [
+  {
+    TEXT: "Home",
+    HREF: "/",
+  },
+  // {
+  //   TEXT: "Work",
+  //   HREF: "/work",
+  // },
+  {
+    TEXT: "Tech",
+    HREF: "/blog/tech",
+  },
+  {
+    TEXT: "Culture",
+    HREF: "/blog/personal",
+  },
+  {
+    TEXT: "Publications",
+    HREF: "/publications",
+  },
+  {
+    TEXT: "Projects",
+    HREF: "/projects",
+  },
+  {
+    TEXT: "Talks",
+    HREF: "/talks",
+  },
+]
+
+// Socials
+export const SOCIALS: Socials = [
+  { 
+    NAME: "Email",
+    ICON: "email", 
+    TEXT: "mireklzicar seznam cz",
+    HREF: "https://mireklzicar.com/contact",
+  },
+  { 
+    NAME: "Github",
+    ICON: "github",
+    TEXT: "mireklzicar",
+    HREF: "https://github.com/mireklzicar"
+  },
+  { 
+    NAME: "LinkedIn",
+    ICON: "linkedin",
+    TEXT: "miroslavlzicar",
+    HREF: "https://www.linkedin.com/in/miroslavlzicar/",
+  },
+  { 
+    NAME: "Twitter",
+    ICON: "twitter-x",
+    TEXT: "miroslavlzicar",
+    HREF: "https://twitter.com/miroslavlzicar",
+  },
+  { 
+    NAME: "Orcid",
+    ICON: "orcid",
+    TEXT: "0000-0003-3192-8007",
+    HREF: "http://orcid.org/0000-0003-3192-8007",
+  },
+]
+</file>
+
+<file path="src/layouts/ArticleBottomLayout.astro">
+---
+import { type CollectionEntry, getCollection } from "astro:content"
+
+type Props = {
+  entry: CollectionEntry<"blog"> | CollectionEntry<"projects"> | CollectionEntry<"publications"> | CollectionEntry<"talks">
+}
+
+// Get the requested entry
+const { entry } = Astro.props
+const { collection } = entry
+const { Content, headings } = await entry.render()
+
+// Check if table of contents is enabled
+const showToc = 'toc' in entry.data && entry.data.toc === true
+
+// Get the next and prev entries (modulo to wrap index)
+const items = (await getCollection(collection))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+const index = items.findIndex(x => x.slug === entry.slug)
+const prev = items[(index - 1 + items.length) % items.length]
+const next = items[(index + 1) % items.length]
+---
+
+<div>
+  <article>
+    {showToc && headings.length > 0 && (
+      <div class="toc-container mb-8 p-4 border border-black/15 dark:border-white/20 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4">Table of Contents</h2>
+        <ul class="space-y-2">
+          {headings
+            .filter(heading => heading.depth <= 3) // Only include h1, h2, h3
+            .map(heading => (
+              <li class={`toc-item toc-level-${heading.depth}`} style={`margin-left: ${(heading.depth - 1) * 1.5}rem`}>
+                <a href={`#${heading.slug}`} class="hover:text-black dark:hover:text-white hover:underline blend">
+                  {heading.text}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    )}
+    <Content/>
+  </article>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <a href={`/${prev.collection}/${prev.slug}`} class="group p-4 gap-3 flex items-center border rounded-lg hover:bg-black/5 hover:dark:bg-white/10 border-black/15 dark:border-white/20 blend">
+      <div class="order-2 w-full h-full group-hover:text-black group-hover:dark:text-white blend">
+        <div class="flex flex-wrap gap-2">
+          <div class="text-sm uppercase">
+            Prev
+          </div>
+        </div>
+        <div class="font-semibold mt-3 text-black dark:text-white">
+          {prev.data.title}
+        </div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="order-1 stroke-current group-hover:stroke-black group-hover:dark:stroke-white rotate-180">
+        <line x1="5" y1="12" x2="19" y2="12" class="scale-x-0 group-hover:scale-x-100 translate-x-4 group-hover:translate-x-1 transition-all duration-300 ease-in-out" />
+        <polyline points="12 5 19 12 12 19" class="translate-x-0 group-hover:translate-x-1 transition-all duration-300 ease-in-out" />
+      </svg>
+    </a>
+    <a href={`/${next.collection}/${next.slug}`} class="group p-4 gap-3 flex items-center border rounded-lg hover:bg-black/5 hover:dark:bg-white/10 border-black/15 dark:border-white/20 transition-colors duration-300 ease-in-out">
+      <div class="w-full h-full text-right group-hover:text-black group-hover:dark:text-white blend">
+        <div class="text-sm uppercase">
+          Next
+        </div>
+        <div class="font-semibold mt-3 text-black dark:text-white">
+          {next.data.title}
+        </div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="stroke-current group-hover:stroke-black group-hover:dark:stroke-white">
+        <line x1="5" y1="12" x2="19" y2="12" class="scale-x-0 group-hover:scale-x-100 translate-x-4 group-hover:translate-x-1 transition-all duration-300 ease-in-out" />
+        <polyline points="12 5 19 12 12 19" class="translate-x-0 group-hover:translate-x-1 transition-all duration-300 ease-in-out" />
+      </svg>
+    </a>
+  </div>
+</div>
+</file>
+
+<file path="src/layouts/ArticleTopLayout.astro">
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, readingTime } from '../lib/utils';
+
+interface Props {
+  entry: CollectionEntry<'blog' | 'projects' | 'publications' | 'talks'>;
+}
+
+const { entry } = Astro.props;
+const { data, collection, body } = entry;
+const { title, summary, date } = data;
+const allowedCollections = ['projects', 'publications', 'talks', 'blog'] as const;
+
+// Type guard function
+const hasDemoUrl = (data: any): data is { demoUrl?: string } => {
+  return 'demoUrl' in data;
+};
+
+const hasOriginalUrl = (data: any): data is { originalUrl?: string } => {
+  return 'originalUrl' in data;
+};
+
+const hasReadMoreUrl = (data: any): data is { readMoreUrl?: string } => {
+  return 'readMoreUrl' in data;
+};
+
+const hasXUrl = (data: any): data is { xUrl?: string } => {
+  return 'xUrl' in data;
+};
+
+const hasPdfUrl = (data: any): data is { pdfUrl?: string } => {
+  return 'pdfUrl' in data;
+};
+
+const getPdfPath = (filename: string) => {
+    if (import.meta.env.DEV) {
+      return `/src/content/${entry.collection}/${entry.slug}/${filename}`;
+    }
+    // For production, use the path where images will be copied during build
+    return `/content/${entry.collection}/${entry.slug}/${filename}`;
+};
+
+// Handle different URL types for different collections
+const demoUrl = allowedCollections.includes(collection as any) && hasDemoUrl(data) ? data.demoUrl : null;
+const readMoreUrl = allowedCollections.includes(collection as any) && hasReadMoreUrl(data) ? data.readMoreUrl : null;
+const originalUrl = allowedCollections.includes(collection as any) && hasOriginalUrl(data) ? data.originalUrl : null;
+const repoUrl = collection === "projects" ? data.repoUrl : null;
+const publicationUrl = collection === "publications" ? data.publicationUrl : null;
+const arxivUrl = collection === "publications" ? data.arxivUrl : null;
+const zenodoUrl = collection === "publications" ? data.zenodoUrl : null;
+const githubUrl = collection === "publications" ? data.githubUrl : null;
+const xUrl = allowedCollections.includes(collection as any) && hasXUrl(data) ? data.xUrl : null;
+const youtubeUrl = collection === "talks" ? data.youtubeUrl : null;
+const pdfUrl = allowedCollections.includes(collection as any) && hasPdfUrl(data) ? getPdfPath(data.pdfUrl) : null;
+
+---
+
+<div>
+  <a href={collection === 'blog' ? `/blog/${data.category}` : `/${collection}`} class="group w-fit p-1.5 gap-1.5 text-sm flex items-center border rounded hover:bg-black/5 hover:dark:bg-white/10 border-black/15 dark:border-white/20 transition-colors duration-300 ease-in-out">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="stroke-current group-hover:stroke-black group-hover:dark:stroke-white">
+      <line x1="19" y1="12" x2="5" y2="12" class="scale-x-0 group-hover:scale-x-100 translate-x-3 group-hover:translate-x-0 transition-all duration-300 ease-in-out" />
+      <polyline points="12 19 5 12 12 5" class="translate-x-1 group-hover:translate-x-0 transition-all duration-300 ease-in-out" />
+    </svg>
+    <div class="w-full group-hover:text-black group-hover:dark:text-white transition-colors duration-300 ease-in-out">
+      Back to {collection === 'blog' ? data.category === 'tech' ? 'Tech' : 'Culture' : collection}
+    </div>
+  </a>
+  <div class="flex flex-wrap text-sm uppercase mt-12 gap-3 opacity-75">
+    <div class="flex items-center gap-2">
+      <svg class="size-5 stroke-current">
+        <use href="/ui.svg#calendar"/>
+      </svg>
+      {formatDate(date)}
+    </div>
+    <div class="flex items-center gap-2">
+      <svg class="size-5 stroke-current">
+        <use href="/ui.svg#book-open"/>
+      </svg>
+      {readingTime(body)}
+    </div>
+  </div>
+  <h1 class="text-3xl font-semibold text-black dark:text-white mt-2">
+    {title}
+  </h1>
+  <div class="mt-1">
+    {summary}
+  </div>
+  {(demoUrl || repoUrl || publicationUrl || arxivUrl || zenodoUrl || githubUrl || xUrl || youtubeUrl || originalUrl || readMoreUrl) &&
+    <div class="mt-4 flex flex-wrap gap-2">
+      {demoUrl && 
+        <a href={demoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#globe" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Demo
+          </span>
+        </a>
+      }
+      {repoUrl && 
+        <a href={repoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#git-branch" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Repository
+          </span>
+        </a>
+      }
+      {publicationUrl && 
+        <a href={publicationUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#document" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Publication
+          </span>
+        </a>
+      }
+      {arxivUrl && 
+        <a href={arxivUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-8">
+            <use href="/ui.svg#archive" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Preprint
+          </span>
+        </a>
+      }
+      {zenodoUrl && 
+        <a href={zenodoUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-8">
+            <use href="/ui.svg#zenodo" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Zenodo
+          </span>
+        </a>
+      }
+      {githubUrl && 
+        <a href={githubUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/social.svg#github" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            GitHub
+          </span>
+        </a>
+      }
+      {xUrl && 
+        <a href={xUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/social.svg#twitter-x" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Twitter
+          </span>
+        </a>
+      }
+      {youtubeUrl && 
+        <a href={youtubeUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/social.svg#youtube" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            YouTube
+          </span>
+        </a>
+      }
+      {originalUrl && 
+        <a href={originalUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#scroll" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Original Article
+          </span>
+        </a>
+      }
+      {readMoreUrl && 
+        <a href={readMoreUrl} target="_blank" class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend">
+          <svg class="size-4">
+            <use href="/ui.svg#book" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Read More
+          </span>
+        </a>
+      }
+      {pdfUrl && 
+        <a 
+          href={pdfUrl} 
+          target="_blank" 
+          download 
+          class="group flex gap-2 items-center px-3 py-1.5 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend"
+        >
+          <svg class="size-4">
+            <use href="/ui.svg#pdf" class="fill-current group-hover:fill-black group-hover:dark:fill-white blend"/>
+          </svg>
+          <span class="text-current group-hover:text-black group-hover:dark:text-white blend">
+            Download PDF
+          </span>
+        </a>
+      }
+    </div>
+  }
+</div>
+</file>
+
+<file path="astro.config.mjs">
+import { defineConfig } from "astro/config";
+import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
+import tailwind from "@astrojs/tailwind";
+import solidJs from "@astrojs/solid-js";
+import partytown from "@astrojs/partytown";
+
+export default defineConfig({
+  site: "https://mireklzicar.com",
+  base: '.',
+  integrations: [
+    mdx(),
+    sitemap(),
+    solidJs(),
+    tailwind({ applyBaseStyles: false }),
+    partytown({ config: { forward: ["dataLayer.push"] } }),
+  ],
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    },
+  },
+});
+</file>
+
+<file path="src/components/ArrowCard.tsx">
+import { formatDate } from "@lib/utils"
+import type { CollectionEntry } from "astro:content"
+import type { ImageMetadata } from 'astro'
+
+type Props = {
+  entry: CollectionEntry<"blog"> | CollectionEntry<"projects"> | CollectionEntry<"publications"> | CollectionEntry<"talks">
+  pill?: boolean
+}
+
+export default function ArrowCard({ entry, pill }: Props) {
+  // Construct the image path based on environment
+  const getImagePath = (thumbnail: string) => {
+    if (import.meta.env.DEV) {
+      return `/src/content/${entry.collection}/${entry.slug}/${thumbnail}`;
+    }
+    // For production, use the path where images will be copied during build
+    return `/content/${entry.collection}/${entry.slug}/${thumbnail}`;
+  };
+
+  return (
+    <a 
+      href={`/${entry.collection}/${entry.slug}`} 
+      class="group p-5 flex flex-col border rounded-lg hover:bg-black/5 hover:dark:bg-white/10 border-black/15 dark:border-white/20 transition-colors duration-300 ease-in-out"
+    >
+      <div class="flex justify-between items-start gap-4">
+        <div class="flex-grow min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            {pill && (
+              <div class="text-sm capitalize px-2 py-0.5 rounded-full border border-black/15 dark:border-white/25">
+                {entry.collection === "blog" ? "post" : entry.collection === "projects" ? "project" : "publication"}
+              </div>
+            )}
+            <div class="text-sm uppercase">
+              {formatDate(entry.data.date)}
+            </div>
+          </div>
+          <div class="font-semibold mt-3 text-black dark:text-white text-lg">
+            {entry.data.title}
+          </div>
+          <div class="text-sm line-clamp-2 mt-2 group-hover:text-black group-hover:dark:text-white blend">
+            {entry.data.summary}
+          </div>
+        </div>
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke-width="2.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          class="stroke-current group-hover:stroke-black group-hover:dark:stroke-white flex-shrink-0"
+        >
+          <line 
+            x1="5" 
+            y1="12" 
+            x2="19" 
+            y2="12" 
+            class="scale-x-0 group-hover:scale-x-100 translate-x-4 group-hover:translate-x-1 transition-all duration-300 ease-in-out" 
+          />
+          <polyline 
+            points="12 5 19 12 12 19" 
+            class="translate-x-0 group-hover:translate-x-1 transition-all duration-300 ease-in-out" 
+          />
+        </svg>
+      </div>
+      
+      {entry.data.thumbnail && (
+        <div class="mt-4 w-full aspect-[2/1] overflow-hidden rounded-md">
+          <img 
+            src={getImagePath(entry.data.thumbnail)}
+            alt={`Thumbnail for ${entry.data.title}`}
+            width={800}
+            height={400}
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300 ease-in-out"
+            loading="lazy"
+          />
+        </div>
+      )}
+
+      <ul class="flex flex-wrap mt-4 gap-1.5">
+        {entry.data.tags.map((tag: string) => (
+          <li class="text-xs uppercase py-0.5 px-2 rounded bg-black/5 dark:bg-white/20 text-black/75 dark:text-white/75">
+            {tag}
+          </li>
+        ))}
+      </ul>
+    </a>
+  )
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "astro-sphere",
+  "type": "module",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22.7.0",
+    "npm": ">=10.8.2"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "dev:network": "astro dev --host",
+    "start": "astro dev",
+    "build": "node scripts/copy-assets.mjs && astro build",
+    "preview": "astro preview",
+    "preview:network": "astro dev --host",
+    "astro": "astro",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.5.6",
+    "@astrojs/mdx": "^2.1.1",
+    "@astrojs/partytown": "^2.1.2",
+    "@astrojs/rss": "^4.0.5",
+    "@astrojs/sitemap": "^3.1.1",
+    "@astrojs/solid-js": "^4.0.1",
+    "@astrojs/tailwind": "^5.1.0",
+    "@tailwindcss/typography": "^0.5.10",
+    "astro": "^4.4.13",
+    "clsx": "^2.1.0",
+    "fuse.js": "^7.0.0",
+    "sharp": "^0.33.2",
+    "solid-js": "^1.8.15",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}
+</file>
+
+<file path=".github/workflows/deploy.yml">
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm clean-install
+
+              # Add this step before build
+      - name: Prepare public directory
+        run: |
+            mkdir -p public
+            node scripts/copy-assets.mjs
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        
+      - name: Build
+        run: npm run build
+        env:
+          CI: true
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
+          GITHUB_PAGES: true
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'  # Assuming your build outputs to dist/
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+</file>
+
+<file path="src/pages/index.astro">
+---
+import { getCollection } from "astro:content"
+import PageLayout from "@layouts/PageLayout.astro"
+import ArrowCard from "@components/ArrowCard"
+import StackCard from "@components/StackCard.astro"
+import { SITE, SOCIALS } from "@consts"
+import TwinklingStars from "@components/TwinklingStars.astro"
+import MeteorShower from "@components/MeteorShower.astro"
+
+
+const allPosts = (await getCollection("blog"))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+
+const techPosts = allPosts
+  .filter(post => post.data.category === "tech")
+  .slice(0,3)
+
+const culturePosts = allPosts
+  .filter(post => post.data.category === "personal")
+  .slice(0,3)
+
+const projects = (await getCollection("projects"))
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0,3)
+
+const talks = (await getCollection("talks"))
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0,3)
+
+const publications = (await getCollection("publications"))
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0,3)
+
+const stack = [
+  { 
+    text: "Astro", 
+    icon: "astro", 
+    href: "https://astro.build" 
+  },
+  { 
+    text: "Javascript", 
+    icon: "javascript", 
+    href: "https://www.javascript.com" 
+  },
+  { 
+    text: "Typescript", 
+    icon: "typescript", 
+    href: "https://www.typescriptlang.org" 
+  },
+  { 
+    text: "Tailwind", 
+    icon: "tailwind", 
+    href: "https://tailwindcss.com" 
+  },
+]
+---
+
+<PageLayout title="Home" description={SITE.DESCRIPTION}>
+
+  <!-- Light Mode: Particles -->
+  <div class='absolute inset-0 block dark:hidden'>
+    <div id='particles1' class='fixed inset-0'></div>
+    <div id='particles2' class='fixed inset-0'></div>
+    <div id='particles3' class='fixed inset-0'></div>
+  </div>
+
+  <!-- Dark Theme: Stars -->
+  <div class='absolute inset-0 bg-black hidden dark:block'>
+    <div id='stars1' class='fixed inset-0'></div>
+    <div id='stars2' class='fixed inset-0'></div>
+    <div id='stars3' class='fixed inset-0'></div>
+  </div>
+
+  <!-- Dark Theme: Twinkling Stars / Metors -->
+  <div id="galaxy" class="fixed inset-0">
+    <div class="hidden dark:block">
+      <TwinklingStars/>
+      <MeteorShower/>
+    </div>
+  </div>
+
+  <script is:inline src="/js/bg.js"></script>
+  
+  <!-- HERO -->
+  <section class="relative h-screen w-full">
+    <div id="planetcont" class='animate absolute inset-0 top-1/4 overflow-hidden'>
+      <div id="crescent" class='absolute top-0 left-1/2 -translate-x-1/2 w-[250vw] min-h-[100vh] aspect-square rounded-full p-[1px] bg-gradient-to-b from-black/25 dark:from-white/75 from-0% to-transparent to-5%'>
+        <div id="planet" class='w-full h-full bg-white dark:bg-black rounded-full p-[1px] overflow-hidden flex justify-center'>
+          <div id="blur" class='w-full h-20 rounded-full bg-neutral-900/25 dark:bg-white/25 blur-3xl'/>
+        </div>
+      </div>
+    </div>
+    <div class="animate absolute h-full w-full flex items-center justify-center">
+      <div class='relative w-full h-full flex items-center justify-center'>
+        <div class='p-5 text-center'>
+          <p class='animated text-lg md:text-xl lg:text-2xl font-semibold opacity-75'>
+            Hello, I am ...
+          </p>
+          <p class='animated text-2xl md:text-3xl lg:text-4xl font-bold uppercase text-black dark:text-white'>
+            Miroslav Lzicar
+          </p>
+          <!-- <p class='animated text-sm md:text-base lg:text-lg opacity-75'>
+            CTO @ <a href="https://deepmedchem.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-100 transition-opacity">Deep MedChem</a>
+          </p> -->
+          <div id="ctaButtons" class='animated flex flex-wrap gap-4 justify-center mt-5'>
+            <a href='/contact' class='py-2 px-4 rounded truncate text-xs md:text-sm lg:text-base bg-black dark:bg-white text-white dark:text-black hover:opacity-75 blend'>
+              Say Hi!
+            </a>
+            <a href='/projects' class='py-2 px-4 truncate rounded text-xs md:text-sm lg:text-base border border-black/25 dark:border-white/25 hover:bg-black/5 hover:dark:bg-white/15 blend'>
+              View my projects
+            </a>
+          </div>
+          <button 
+          id="scrollDown"
+          aria-label="Scroll to content"
+          class="animated absolute bottom-8 left-1/2 -translate-x-1/2 p-2 hover:opacity-75 transition-opacity cursor-pointer blend"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2" 
+            stroke-linecap="round" 
+            stroke-linejoin="round"
+            class="animate-bounce"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        
+        <script>
+          document.getElementById('scrollDown')?.addEventListener('click', () => {
+            const aboutSection = document.getElementById('about');
+            aboutSection?.scrollIntoView({ behavior: 'smooth' });
+          });
+        </script>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="about" class="relative bg-white dark:bg-black">
+    <div class="mx-auto max-w-screen-sm p-5 space-y-24 pb-16">
+
+
+  <!-- About Section -->
+  <article class="max-w-prose mx-auto px-4">
+    <h2 class="text-2xl font-bold mb-6 text-black dark:text-white">About Me</h2>
+    <div class="mb-8 space-y-4">
+      <p class="text-lg leading-relaxed">
+        Currently serving as the <a class="font-semibold" style="text-decoration: none" href="https://deepmedchem.com/" target="_blank">CTO of Deep MedChem</a>, I lead initiatives to accelerate in-silico drug discovery through innovative AI solutions.
+      </p>
+      <p class="text-lg leading-relaxed">
+        My experience spans:
+        <ul class="list-disc list-inside mt-2 space-y-2">
+          <li>AI/ML in Drug Discovery</li>
+          <li>Machine Learning Research (Former at <a style="text-decoration: none" href="https://themama.ai/" target="_blank">MAMA AI</a>)</li>
+          <li>Scientific Programming (Former at <a style="text-decoration: none" href="https://www.biodviser.com/" target="_blank">Biodviser</a>, <a style="text-decoration: none" href="https://www.eli-beams.eu/" target="_blank">ELI Beamlines</a>)</li>
+          <li>Fullstack Development (Former at <a style="text-decoration: none" href="https://cuni.cz/UKEN-1.html" target="_blank">Charles University</a>)</li>
+        </ul>
+      </p>
+    </div>
+
+      <div class="flex flex-wrap gap-1 items-center justify-center">
+        {
+          SOCIALS.map((SOCIAL) => (
+            <a 
+              href={SOCIAL.HREF} 
+              target="_blank" 
+              aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`} 
+              class="group size-10 rounded-full p-2 items-center justify-center hover:bg-black/5 dark:hover:bg-white/20  blend"
+            >
+              <svg class="size-full fill-current group-hover:fill-black group-hover:dark:fill-white blend">
+                <use href={`/social.svg#${SOCIAL.ICON}`} />
+              </svg>
+            </a>
+          ))
+        }
+        </div>
+
+    </article>
+  </section>
+
+      <!-- Blog Preview Section -->
+
+      
+      <!-- Tech Blog Posts Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent posts (Tech)
+            </p>
+            <a href="/blog/tech" class="w-fit group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All Tech posts
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {techPosts.map((post) => (
+              <li>
+                <ArrowCard entry={post} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <!-- Culture Blog Posts Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent posts (Culture)
+            </p>
+            <a href="/blog/personal" class="w-fit group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All Culture posts
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {culturePosts.map((post) => (
+              <li>
+                <ArrowCard entry={post} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <!-- Publications Preview Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent publications
+            </p>
+            <a href="/publications" class="w-fit col-span-3 group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All publications
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {publications.map((publication) => (
+              <li>
+                <ArrowCard entry={publication} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+
+      <!-- Project Preview Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent projects
+            </p>
+            <a href="/projects" class="w-fit col-span-3 group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All projects
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {projects.map((project) => (
+              <li>
+                <ArrowCard entry={project} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+
+      <!-- talks Preview Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <p class="font-semibold text-black dark:text-white">
+              Recent talks
+            </p>
+            <a href="/talks" class="w-fit col-span-3 group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+              <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                All talks
+              </span>
+            </a>
+          </div>
+          <ul class="space-y-4">
+            {talks.map((talk) => (
+              <li>
+                <ArrowCard entry={talk} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+
+  
+      <!-- Contact Section 
+      <section class="animate">
+        <div>
+          <p class="font-semibold text-black dark:text-white">
+            Let's Connect
+          </p>
+          <p>
+            Reach out to me via email or on social media.
+          </p>
+          <div class="grid grid-cols-4 gap-y-2 mt-4 auto-cols-min">
+            {SOCIALS.map(social => (
+              <div class="col-span-1 flex items-center gap-1">
+                <span class="whitespace-nowrap truncate">
+                  {social.NAME}
+                </span>
+              </div>
+              <div class="col-span-3 truncate">
+                <a href={social.HREF} target="_blank" class="w-fit col-span-3 group flex gap-1 items-center underline decoration-[.5px] decoration-black/25 dark:decoration-white/50 hover:decoration-black dark:hover:decoration-white text-black dark:text-white underline-offset-2 blend">
+                  <span class="text-black/75 dark:text-white/75 group-hover:text-black group-hover:dark:text-white blend">
+                    {social.TEXT}
+                  </span>
+                </a>
+              </div>
+            ))}
+        </div>
+      </section>
+      -->
+  
+      <!-- Tech Stack Section -->
+      <section class="animate">
+        <div class="space-y-4">
+          <p class="font-semibold text-black dark:text-white">
+            Website build with
+          </p>
+          <div class="flex flex-wrap items-center gap-2 mt-5">
+            {stack.map(item => (
+              <StackCard 
+                text={item.text}
+                icon={item.icon}
+                href={item.href}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</PageLayout>
+</file>
+
+</files>

@@ -1,0 +1,58 @@
+/* LaTeX-style theorem and proof environments */
+.theorem {
+  display: block;
+  margin: 1.5em 0;
+  font-style: italic;
+  padding: 0.5em 1em;
+  border-left: 3px solid #4a5568;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.theorem strong {
+  font-style: normal;
+  font-weight: bold;
+}
+
+.proof {
+  display: block;
+  margin: 1.5em 0;
+  padding: 0.5em 1em;
+}
+
+.proof strong {
+  font-weight: bold;
+}
+
+/* Add a QED symbol at the end of proofs */
+.proof::after {
+  content: "□";
+  display: inline-block;
+  float: right;
+  font-size: 1.2em;
+  margin-top: 0.5em;
+}
+
+/* Additional styling for math in theorems and proofs */
+.theorem .math-inline,
+.proof .math-inline {
+  font-style: normal;
+}
+
+/* Paper-like styling for math content */
+.math-content {
+  font-family: 'KaTeX_Main', serif;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .theorem {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #718096;
+  }
+  
+  .math-content {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}

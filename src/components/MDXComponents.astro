@@ -1,0 +1,263 @@
+---
+import CodeBlock from './CodeBlock.astro';
+---
+
+<Fragment>
+  <slot />
+</Fragment>
+
+<script>
+  // TypeScript declaration for Prism
+  declare global {
+    interface Window {
+      Prism: {
+        languages: Record<string, any>;
+        highlightAll: () => void;
+        highlightElement: (element: Element) => void;
+      };
+    }
+  }
+
+  // Add BibTeX syntax highlighting to Prism
+  if (typeof window !== 'undefined' && window.Prism) {
+    window.Prism.languages.bibtex = {
+      'comment': /%.*/,
+      'string': {
+        pattern: /{\\(?:[^{}\\]|\\[{}\\])*}|"(?:[^"\\]|\\.)*"/,
+        greedy: true
+      },
+      'entry': {
+        pattern: /@\w+(?=\s*\{)/i,
+        alias: 'keyword'
+      },
+      'key': {
+        pattern: /(\{\s*)[a-z0-9_-]+(?=\s*,)/i,
+        lookbehind: true,
+        alias: 'property'
+      },
+      'field': {
+        pattern: /(\s*)[a-z0-9_-]+(?=\s*=)/i,
+        lookbehind: true,
+        alias: 'property'
+      },
+      'value': {
+        pattern: /(=\s*)[a-z0-9_-]+/i,
+        lookbehind: true,
+        alias: 'number'
+      },
+      'punctuation': /[{}=,]/
+    };
+  }
+
+  // Function to add copy buttons to all code blocks
+  function addCopyButtonsToCodeBlocks() {
+    // Find all pre > code elements
+    const codeBlocks = document.querySelectorAll('pre > code');
+    
+    codeBlocks.forEach((codeBlock) => {
+      const pre = codeBlock.parentElement;
+      if (!pre) return;
+      
+      // Skip if already processed
+      if (pre.parentElement?.classList.contains('code-block-wrapper')) return;
+      
+      // Get the code content
+      const code = codeBlock.textContent || '';
+      
+      // Get language class if it exists
+      let language = '';
+      codeBlock.classList.forEach((className) => {
+        if (className.startsWith('language-')) {
+          language = className.replace('language-', '');
+        }
+      });
+      
+      // Special handling for bibtex blocks
+      if (code.trim().startsWith('@') && code.includes('author') && code.includes('title') && code.includes('year')) {
+        language = 'bibtex';
+        if (!codeBlock.classList.contains('language-bibtex')) {
+          codeBlock.classList.add('language-bibtex');
+          // Re-highlight with Prism if available
+          if (typeof window !== 'undefined' && window.Prism && window.Prism.highlightElement) {
+            window.Prism.highlightElement(codeBlock);
+          }
+        }
+      }
+      
+      // Create the wrapper div
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper relative my-6';
+      
+      // Create the header div
+      const header = document.createElement('div');
+      header.className = 'code-header flex justify-between items-center bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-t-lg';
+      
+      // Add language indicator if available
+      if (language) {
+        const langIndicator = document.createElement('span');
+        langIndicator.className = 'text-xs text-gray-500 dark:text-gray-400';
+        langIndicator.textContent = language;
+        header.appendChild(langIndicator);
+      }
+      
+      // Create the copy button
+      const button = document.createElement('button');
+      button.className = 'copy-button text-sm bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 px-2 py-1 rounded transition-colors ml-auto';
+      button.setAttribute('data-code', code);
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+      
+      const buttonText = document.createElement('span');
+      buttonText.className = 'copy-text';
+      buttonText.textContent = 'Copy';
+      button.appendChild(buttonText);
+      
+      // Add the button to the header
+      header.appendChild(button);
+      
+      // Insert the wrapper and header before the pre element
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(header);
+      wrapper.appendChild(pre);
+      
+      // Update pre styling but preserve all classes for syntax highlighting
+      pre.classList.add('rounded-t-none');
+      pre.style.margin = '0';
+      
+      // Add click event to the button
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code);
+          buttonText.textContent = 'Copied!';
+          setTimeout(() => {
+            buttonText.textContent = 'Copy';
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy: ', err);
+          buttonText.textContent = 'Failed!';
+          setTimeout(() => {
+            buttonText.textContent = 'Copy';
+          }, 2000);
+        }
+      });
+    });
+  }
+
+  // Run on initial load
+  addCopyButtonsToCodeBlocks();
+
+  // Also run when the DOM content is loaded (for client-side navigation)
+  document.addEventListener('DOMContentLoaded', addCopyButtonsToCodeBlocks);
+
+  // For Astro view transitions
+  document.addEventListener('astro:page-load', addCopyButtonsToCodeBlocks);
+</script>
+
+<style is:global>
+  /* Ensure code blocks maintain their styling */
+  .code-block-wrapper pre {
+    margin: 0;
+  }
+  
+  /* Preserve Prism syntax highlighting */
+  .code-block-wrapper pre code {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+  }
+  
+  /* Ensure the copy button is positioned correctly */
+  .code-header {
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Add some styling for specific code elements to enhance syntax highlighting */
+  .code-block-wrapper .token.comment,
+  .code-block-wrapper .token.prolog,
+  .code-block-wrapper .token.doctype,
+  .code-block-wrapper .token.cdata {
+    color: #8292a2;
+  }
+
+  .code-block-wrapper .token.punctuation {
+    color: #f8f8f2;
+  }
+
+  .code-block-wrapper .token.namespace {
+    opacity: .7;
+  }
+
+  .code-block-wrapper .token.property,
+  .code-block-wrapper .token.tag,
+  .code-block-wrapper .token.constant,
+  .code-block-wrapper .token.symbol,
+  .code-block-wrapper .token.deleted {
+    color: #f92672;
+  }
+
+  .code-block-wrapper .token.boolean,
+  .code-block-wrapper .token.number {
+    color: #ae81ff;
+  }
+
+  .code-block-wrapper .token.selector,
+  .code-block-wrapper .token.attr-name,
+  .code-block-wrapper .token.string,
+  .code-block-wrapper .token.char,
+  .code-block-wrapper .token.builtin,
+  .code-block-wrapper .token.inserted {
+    color: #a6e22e;
+  }
+
+  .code-block-wrapper .token.operator,
+  .code-block-wrapper .token.entity,
+  .code-block-wrapper .token.url,
+  .code-block-wrapper .language-css .token.string,
+  .code-block-wrapper .style .token.string {
+    color: #f8f8f2;
+  }
+
+  .code-block-wrapper .token.atrule,
+  .code-block-wrapper .token.attr-value,
+  .code-block-wrapper .token.keyword {
+    color: #66d9ef;
+  }
+
+  .code-block-wrapper .token.function,
+  .code-block-wrapper .token.class-name {
+    color: #e6db74;
+  }
+
+  .code-block-wrapper .token.regex,
+  .code-block-wrapper .token.important,
+  .code-block-wrapper .token.variable {
+    color: #fd971f;
+  }
+
+  /* BibTeX specific syntax highlighting */
+  .code-block-wrapper .language-bibtex .token.entry {
+    color: #66d9ef;
+    font-weight: bold;
+  }
+
+  .code-block-wrapper .language-bibtex .token.key {
+    color: #a6e22e;
+  }
+
+  .code-block-wrapper .language-bibtex .token.field {
+    color: #fd971f;
+  }
+
+  .code-block-wrapper .language-bibtex .token.string {
+    color: #e6db74;
+  }
+
+  .code-block-wrapper .language-bibtex .token.value {
+    color: #ae81ff;
+  }
+
+  .code-block-wrapper .language-bibtex .token.comment {
+    color: #75715e;
+    font-style: italic;
+  }
+</style>

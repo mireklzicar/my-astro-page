@@ -1,0 +1,209 @@
+---
+title: "Memecoins as a Vanity Fair: only 1 in 10 000 Solana tokens has a social footprint and clears a basic rug‑check"
+summary: "Using on‑chain metadata for every token minted on Solana in February 2025, we show that fewer than 0.01 % of fresh meme‑coins meet even the loosest criteria for legitimacy."
+date: "May 18 2025"
+draft: false
+category: tech
+tags:
+- Crypto
+- Solana
+- Memecoins
+- Python
+thumbnail: vanityfair.jpg
+zenodoUrl: "https://zenodo.org/records/15469078"
+githubUrl: "https://github.com/mireklzicar/memecoins_sanity_check"
+xUrl: "https://x.com/miroslavlzicar/status/1924166294661669097"
+toc: true
+---
+
+import Table from '@components/Table.astro';
+import References from '@components/References.astro';
+import Citation from '@components/Citation.astro';
+import Cite from '@components/Cite.astro';
+
+This note tries to put numbers on a few simple questions:
+
+* **How many tokens are minted in a single month?**
+* **What share shows any sign of contact, social site or online community – a website, an email, Telagram, GitHub, X handle, Discord?**
+* **How many survive a first‑pass “rug‑check” (liquidity, ownership dispersion, locked LP)?**
+
+The exercise is deliberately narrow – Solana only, one calendar month only – and deliberately modest: I do **not** tell you which coin to ape into next.
+Instead, I try to quantify just how *lottery‑like* the memecoin field has become.
+
+![](vanityfair.jpg)
+
+## Methodology
+
+### Data collection
+
+* **Token universe** – I pulled every mint event with Dextools API<Cite id="dextools" /> between 2025‑02‑01 00:00 UTC and 2025‑02‑29 23:59 UTC (≈ 756 648 unique mint addresses).
+* **Social footprint** – For each address I queried `/socialInfo`. A token counts as *having socials* if **any** of the 16 supported fields (website, email, X/Twitter, Telegram, GitHub, …) is non‑empty.
+* **Rug‑check** – I fed the mint address to rugcheck.xyz<Cite id="rugcheck" /> and labelled the coin *"passes"* when no alert of level `warn` or `danger` was returned.
+
+### Limitations & Reproducibility
+
+* No attempt was made to evaluate *utility*, *road‑map*, or *fair launch* claims – the scope is purely **red‑flag hygiene**. I haven't evaluated more sophisticated schemes such as *bundling*.
+* A single month of February‑2025 is analyzed to decrease API costs. It is not necessarily representative.
+* The analysis ignores **copy‑minting on other chains** (Blast, Base).
+* Rug‑check's heuristics update over time; re‑running the script next year will shift numbers.
+* The full python scripts and query notebooks (Python, Jupyter) and raw JSON and CSV files live in a GitHub repo I can share upon request<Cite id="bitquery" />.
+
+## Results
+
+### Aggregate counts
+
+<Table
+  headers={["Metric", "Tokens", "Share"]}
+  rows={[
+    ["Total coins", "756 648", "100 %"],
+    ["With ≥ 1 social link", "742", "0.10 %"],
+    ["Pass all rug‑check tests", "91", "0.012 %"],
+  ]}
+  striped={true}
+  bordered={true}
+  hover={true}
+/>
+
+Put differently, **only one in \~10 000 freshly minted Solana tokens both tells you who they are *and* shows no obvious technical red flags**.
+
+### Which socials matter?
+
+<Table
+  headers={["Platform", "Count", "Percentage"]}
+  rows={[
+    ["x/twitter", "685", "92.3%"],
+    ["telegram", "678", "91.4%"],
+    ["website", "547", "73.7%"],
+    ["email", "198", "26.7%"],
+    ["reddit", "23", "3.1%"],
+    ["instagram", "18", "2.4%"],
+    ["tiktok", "17", "2.3%"],
+    ["github", "15", "2.0%"],
+    ["discord", "12", "1.6%"],
+    ["youtube", "7", "0.9%"],
+    ["facebook", "5", "0.7%"],
+    ["medium", "3", "0.4%"],
+  ]}
+  striped={true}
+  bordered={true}
+  hover={true}
+/>
+
+### Rug‑check alert stack
+
+<Table
+  headers={["Alert", "Count", "Percentage"]}
+  rows={[
+    ["Low amount of LP Providers", "572", "29.5%"],
+    ["Low Liquidity", "349", "18.0%"],
+    ["Single holder ownership", "238", "12.3%"],
+    ["Top 10 holders high ownership", "179", "9.2%"],
+    ["High ownership", "159", "8.2%"],
+    ["Mutable metadata", "145", "7.5%"],
+    ["Large Amount of LP Unlocked", "121", "6.2%"],
+    ["Creator history of rugged tokens", "89", "4.6%"],
+    ["High holder concentration", "24", "1.2%"],
+    ["Fee config enabled", "16", "0.8%"],
+    ["High holder correlation", "15", "0.8%"],
+    ["Copycat token", "13", "0.7%"],
+    ["Symbol Mismatch", "5", "0.3%"],
+    ["Name Mismatch", "4", "0.2%"],
+    ["Mint Authority still enabled", "4", "0.2%"],
+    ["Low Amount of holders", "3", "0.2%"],
+    ["Freeze Authority still enabled", "1", "0.1%"],
+  ]}
+  striped={true}
+  bordered={true}
+  hover={true}
+/>
+
+
+## Discussion
+
+### 1. Socials ≠ legitimacy, but absence is a screaming red flag
+
+A Telegram channel costs nothing; a GitHub repo can be copied in seconds.
+Yet 99.9 % of tokens **don’t bother**.
+That aligns with anecdotal trading heuristics – *"If it has no X handle, skip"*<Cite id="redditStrategy" /> – shared by veteran Solana snipers.
+
+### 2. Rug‑checks as hygiene, not due diligence
+
+Tools such as Rugcheck, Sniperoo or DEXTools' "honey‑pot" detector<Cite id="dextoolsGlossary" /> catch the *low‑hanging scams* – unlocked LP, mint authority, fee‑on‑transfer.
+
+They do **not** protect against:
+
+* **Bundlers / soft rugs** – devs sell liquidity gradually after building trust<Cite id="merkle" />.
+* **VC unlock cliffs** disguised as "community airdrops"<Cite id="chainplay" />.
+* **Social engineering** via celebrity hacks (the \$PSYOP saga on X)<Cite id="nypost" />.
+
+### 3. Why so many mints?
+
+The *zero‑to‑token* cost on pump.fun fell from 6 SOL to **0.1 SOL** in January 2025<Cite id="pumpfun" />, pushing the daily mint count above **280 k** at peak.
+When the marginal cost of creation is \~\$10 and upside is a BONK‑like 1000×, *spam* is rational<Cite id="fortune" />.
+
+### 4. Half‑life and the greater‑fool problem
+
+If a coin’s viable window is measured in *hours*, timing eclipses fundamentals.
+Trading becomes a reflex game – hence the proliferation of sniper bots, bundle sniffers and real‑time Rugcheck APIs.
+
+## Citation
+Please cite this work as:
+
+```
+Lžičař, Miroslav. "Memecoins as a Vanity Fair: only 1 in 10 000 Solana tokens has a social footprint and clears a basic rug‑check". mireklzicar.com (May 2025). https://mireklzicar.com/blog/memecoins/
+```
+
+Or use the BibTex citation:
+```bibtex
+@article{lzicar2025memecoins,
+  title = {Memecoins as a Vanity Fair: only 1 in 10 000 Solana tokens has a social footprint and clears a basic rug‑check},
+  author = {Lžičař, Miroslav},
+  journal = {mireklzicar.com},
+  year = {2025},
+  month = {May},
+  url = "https://mireklzicar.com/blog/memecoins/"
+}
+```
+
+<References title="References">
+  <Citation id="dextools">
+    <a href="https://developer.dextools.io/"><em>Dextools API</em></a>
+  </Citation>
+  
+  <Citation id="bitquery">
+    <a href="https://bitquery.io/blockchains/solana-blockchain-api"><em>Bitquery – Solana Blockchain API</em></a>.
+  </Citation>
+
+  <Citation id="rugcheck">
+    <a href="https://x.com/rugcheckxyz"><em>Rugcheck (X account)</em></a>.
+  </Citation>
+
+  <Citation id="chainplay">
+    <a href="https://cryptopotato.com/a-shocking-number-of-meme-coins-have-failed-in-2024-study/"><em>A Shocking Number of Meme Coins Have Failed in 2024</em> (CryptoPotato, Aug 18 2024)</a>.
+  </Citation>
+
+  <Citation id="merkle">
+    <a href="https://www.coindesk.com/business/2025/02/11/crypto-investors-lost-over-usd500m-in-memecoin-rug-pulls-and-scams-in-2024"><em>Over Half a Billion Lost in Memecoin Rug Pulls and Scams in 2024</em> (CoinDesk, Feb 11 2025)</a>.
+  </Citation>
+
+  <Citation id="redditStrategy">
+    <a href="https://www.reddit.com/r/solana/comments/1bk5xlq/whats_your_memecoin_trading_strategy_heres_mine/"><em>What's your memecoin trading strategy?</em> r/solana, Jan 2024</a>.
+  </Citation>
+
+  <Citation id="dextoolsGlossary">
+    <a href="https://info.dextools.io/crypto-glossary/rug-pull/"><em>Rug Pull – DEXTools Glossary</em></a>.
+  </Citation>
+
+  <Citation id="nypost">
+    <a href="https://nypost.com/2025/05/17/world-news/get-rich-quick-crypto-gurus-are-targeting-teens/"><em>“Get‑rich‑quick crypto 'gurus' are targeting teens…”</em> NYPost, May 17 2025</a>.
+  </Citation>
+
+  <Citation id="pumpfun">
+    <a href="https://www.ainvest.com/news/pumpswap-fee-cut-drives-8-7m-meme-coin-creations-solana-2503/"><em>PumpSwap's fee cut drives 8.7 m meme‑coin creations on Solana</em> (AInvest, Apr 2025)</a>.
+  </Citation>
+
+  <Citation id="fortune">
+    <a href="https://fortune.com/crypto/2025/02/26/solana-dips-memecoin-trading-cools-libra/"><em>Solana hits 5‑month low as memecoin traders back off</em> (Fortune Crypto, Feb 26 2025)</a>.
+  </Citation>
+
+</References>

@@ -1,0 +1,106 @@
+---
+// References.astro - A component to display references/citations where you want them
+// Instead of having them automatically appended as footnotes
+
+interface Props {
+  className?: string;
+  title?: string;
+}
+
+const { className = "", title = "References" } = Astro.props;
+---
+
+<div class={`references-section ${className}`}>
+  {title && <h2 id="references">{title}</h2>}
+  <div class="references-container">
+    <slot />
+  </div>
+</div>
+
+<style is:global>
+  /* Hide the automatically generated footnotes section */
+  .footnotes {
+    display: none !important;
+  }
+  
+  /* Style for the custom references section */
+  .references-section {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .references-section h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--references-border-color, rgba(0, 0, 0, 0.1));
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .references-container {
+    counter-reset: citation;
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .references-section {
+      --references-border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+</style>
+
+<script>
+  // This script adds citation reference links in the text and handles smooth scrolling
+  document.addEventListener('astro:page-load', () => {
+    // Hide the automatically generated footnotes section
+    const footnotes = document.querySelector('.footnotes');
+    if (footnotes) {
+      (footnotes as HTMLElement).style.display = 'none';
+    }
+    
+    // Add smooth scrolling for citation links
+    document.querySelectorAll('a.citation-ref, a.citation-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href')?.substring(1);
+        const targetElement = document.getElementById(targetId || '');
+        
+        if (targetElement) {
+          // Scroll to the target element with offset for the header
+          const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '5rem');
+          const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+          
+          // Add a highlight effect
+          targetElement.classList.add('highlight-citation');
+          setTimeout(() => {
+            targetElement.classList.remove('highlight-citation');
+          }, 1000);
+          
+          // Update URL without scrolling
+          history.pushState(null, '', link.getAttribute('href') || '');
+        }
+      });
+    });
+  });
+</script>
+
+<style is:global>
+  /* Highlight effect for citations */
+  @keyframes highlight-fade {
+    0% { background-color: var(--highlight-color, rgba(255, 255, 0, 0.1)); }
+    100% { background-color: transparent; }
+  }
+  
+  .highlight-citation {
+    animation: highlight-fade 1s ease-out;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .highlight-citation {
+      --highlight-color: rgba(255, 255, 0, 0.05);
+    }
+  }
+</style>

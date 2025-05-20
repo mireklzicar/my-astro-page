@@ -1,0 +1,112 @@
+---
+// KaTeX component for rendering math in Astro
+---
+
+<style is:global>
+  /* Import KaTeX CSS */
+  @import 'katex/dist/katex.min.css';
+
+  /* Additional styling for math elements */
+  .math-content {
+    font-family: 'KaTeX_Main', serif;
+  }
+  
+  .math-inline {
+    display: inline-block;
+    margin: 0 0.15em;
+    vertical-align: middle;
+  }
+
+  .math-block {
+    display: block;
+    margin: 1.5em auto;
+    text-align: center;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  /* Improve font rendering */
+  .katex {
+    font-size: 1.1em;
+    line-height: 1.2;
+    text-rendering: auto;
+  }
+
+  /* Paper-like styling for block math */
+  .katex-display {
+    padding: 1em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  /* Ensure proper spacing around inline math */
+  p .math-inline {
+    vertical-align: -0.15em;
+  }
+</style>
+
+<script>
+  import katex from 'katex';
+
+  // Function to render math elements
+  function renderMathElements() {
+    // Add math-content class to the article containing math
+    const articles = document.querySelectorAll('article');
+    articles.forEach(article => {
+      if (article.querySelector('.math-inline, .math-block')) {
+        article.classList.add('math-content');
+      }
+    });
+    
+    // Find all elements with class 'math-inline' and render them
+    const inlineMath = document.querySelectorAll('.math-inline');
+    inlineMath.forEach((element) => {
+      try {
+        const formula = element.textContent || '';
+        katex.render(formula, element as HTMLElement, {
+          throwOnError: false,
+          displayMode: false,
+          fleqn: false,
+          output: 'html',
+          strict: 'warn',
+          trust: true,
+          macros: {
+            "\\eqref": "\\href{#1}{}",  // Handle equation references
+          }
+        });
+      } catch (error) {
+        console.error('KaTeX inline rendering error:', error);
+      }
+    });
+
+    // Find all elements with class 'math-block' and render them
+    const blockMath = document.querySelectorAll('.math-block');
+    blockMath.forEach((element) => {
+      try {
+        const formula = element.textContent || '';
+        katex.render(formula, element as HTMLElement, {
+          throwOnError: false,
+          displayMode: true,
+          fleqn: false,
+          leqno: false,
+          output: 'html',
+          strict: 'warn',
+          trust: true,
+          macros: {
+            "\\eqref": "\\href{#1}{}",  // Handle equation references
+          }
+        });
+      } catch (error) {
+        console.error('KaTeX block rendering error:', error);
+      }
+    });
+  }
+
+  // Render math elements when the DOM is loaded
+  document.addEventListener('DOMContentLoaded', renderMathElements);
+
+  // Also re-render when the page content might have changed
+  // This helps with client-side navigation in Astro
+  document.addEventListener('astro:page-load', renderMathElements);
+  document.addEventListener('astro:after-swap', renderMathElements);
+</script>

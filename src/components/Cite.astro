@@ -1,0 +1,87 @@
+---
+// Cite.astro - A component to create citation references in the text
+
+interface Props {
+  id: string;  // The citation ID (e.g., "dextools" for [^dextools])
+}
+
+const { id } = Astro.props;
+---
+
+<a id={`cite-${id}`} href={`#citation-${id}`} class="citation-ref" data-id={id} onclick="handleCiteClick(event, this)">[{id}]</a>
+
+<style>
+  .citation-ref {
+    text-decoration: none;
+    vertical-align: super;
+    font-size: 0.75em;
+    line-height: 0;
+    padding: 0 0.1em;
+    color: var(--cite-color, #0066cc);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .citation-ref:hover {
+    text-decoration: underline;
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .citation-ref {
+      --cite-color: #66aaff;
+    }
+  }
+</style>
+
+<script is:inline>
+  // Function to handle citation link clicks with smooth scrolling
+  function handleCiteClick(event, element) {
+    event.preventDefault();
+    const targetId = element.getAttribute('href')?.substring(1);
+    const targetElement = document.getElementById(targetId || '');
+    
+    if (targetElement) {
+      // Scroll to the target element with offset for the header
+      const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '5rem');
+      const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+      
+      // Add a highlight effect
+      targetElement.classList.add('highlight-citation');
+      setTimeout(() => {
+        targetElement.classList.remove('highlight-citation');
+      }, 1000);
+      
+      // Update URL without scrolling
+      history.pushState(null, '', element.getAttribute('href') || '');
+    }
+  }
+
+  // This script handles the citation numbering
+  document.addEventListener('astro:page-load', () => {
+    // Get all citations in the document
+    const citations = Array.from(document.querySelectorAll('.citation'));
+    const citationMap = new Map();
+    
+    // Create a map of citation IDs to their position in the References section
+    citations.forEach((citation, index) => {
+      if (citation.id) {
+        const id = citation.id.replace('citation-', '');
+        citationMap.set(id, index + 1);
+      }
+    });
+    
+    // Update all citation references in the text
+    document.querySelectorAll('.citation-ref').forEach(cite => {
+      const id = cite.getAttribute('data-id');
+      if (id && citationMap.has(id)) {
+        const number = citationMap.get(id);
+        cite.textContent = `[${number}]`;
+      }
+    });
+  });
+</script>

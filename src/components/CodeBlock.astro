@@ -1,0 +1,64 @@
+---
+interface Props {
+  code: string;
+  language?: string;
+  filename?: string;
+}
+
+const { code, language = "", filename = "" } = Astro.props;
+---
+
+<div class="code-block-wrapper relative my-6">
+  <div class="code-header flex justify-between items-center bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-t-lg">
+    {filename && <span class="text-sm text-gray-600 dark:text-gray-400">{filename}</span>}
+    <button 
+      class="copy-button text-sm bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 px-2 py-1 rounded transition-colors ml-auto"
+      data-code={code}
+      aria-label="Copy code to clipboard"
+    >
+      <span class="copy-text">Copy</span>
+    </button>
+  </div>
+  <pre class={`language-${language} m-0 rounded-t-none`}><code class={`language-${language}`}>{code}</code></pre>
+</div>
+
+<script>
+  // Initialize copy buttons
+  function initCopyButtons() {
+    const copyButtons = document.querySelectorAll('.copy-button');
+    
+    copyButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const code = button.getAttribute('data-code') || '';
+        const copyText = button.querySelector('.copy-text');
+        
+        try {
+          await navigator.clipboard.writeText(code);
+          if (copyText) {
+            copyText.textContent = 'Copied!';
+            setTimeout(() => {
+              copyText.textContent = 'Copy';
+            }, 2000);
+          }
+        } catch (err) {
+          console.error('Failed to copy: ', err);
+          if (copyText) {
+            copyText.textContent = 'Failed!';
+            setTimeout(() => {
+              copyText.textContent = 'Copy';
+            }, 2000);
+          }
+        }
+      });
+    });
+  }
+
+  // Run on initial load
+  initCopyButtons();
+
+  // Also run when the DOM content is loaded (for client-side navigation)
+  document.addEventListener('DOMContentLoaded', initCopyButtons);
+
+  // For Astro view transitions
+  document.addEventListener('astro:page-load', initCopyButtons);
+</script>

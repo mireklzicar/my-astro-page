@@ -1,0 +1,105 @@
+---
+title: "References Demo"
+summary: "A demonstration of how to use the References component for custom citation placement"
+date: "20 February 2000"
+draft: true
+category: tech
+tags:
+- markdown
+- mdx
+- tutorial
+toc: true
+---
+
+import References from '@components/References.astro';
+import Citation from '@components/Citation.astro';
+import Cite from '@components/Cite.astro';
+
+## Introduction
+
+This is a demonstration of how to use the new References component to place citations where you want them in your MDX files, rather than having them automatically appended as footnotes.
+
+## Using Citations
+
+You can cite sources using the Cite component like this <Cite id="first-citation" /> and this <Cite id="second-citation" />. The citations will appear where you place the References component.
+
+## Custom Placement
+
+The key difference is that you can now control where your references appear by placing the `<References>` component in your MDX file.
+
+```jsx
+<References title="References">
+  <Citation id="first-citation">
+    This is the first citation.
+  </Citation>
+  <Citation id="second-citation">
+    This is the second citation.
+  </Citation>
+</References>
+```
+
+You can also customize the title or omit it:
+
+```jsx
+<References title="Sources">
+  <Citation id="example1">
+    Citation content here
+  </Citation>
+</References>
+
+<!-- Or without a title -->
+<References>
+  <Citation id="example2">
+    Another citation here
+  </Citation>
+</References>
+```
+
+<References title="References">
+  <Citation id="first-citation">
+    This is the first citation. It can include links, *formatting*, and other Markdown elements.
+  </Citation>
+  
+  <Citation id="second-citation">
+    Smith, J. (2025). *How to Use References in MDX*. Example Publishing.
+  </Citation>
+</References>
+
+## Content After References
+
+You can continue writing content after the references section. The footnotes will only appear where you placed the References component, not at the end of the document.
+
+## How It Works
+
+The References component:
+
+1. Provides a container for your reference definitions
+2. Hides the automatically generated footnotes section
+3. Ensures proper styling and numbering of references
+4. Optionally adds a heading with the title you specify
+
+The component handles:
+
+- Proper numbering of references (1, 2, 3, etc.)
+- Styling references with proper indentation
+- Hiding the automatically generated footnotes section
+- Formatting the citation numbers in the text as superscript
+
+This gives you complete control over where your citations appear in your document while maintaining a consistent style.
+
+## Additional Features
+
+You can customize the References component with these props:
+
+- `title`: The heading text (defaults to "References" if not provided)
+- `className`: Additional CSS classes to apply to the container
+
+For example:
+
+```mdx
+<References title="Bibliography" className="my-custom-class">
+  <Citation id="example3">
+    Example citation with custom class
+  </Citation>
+</References>
+```

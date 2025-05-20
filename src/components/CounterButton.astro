@@ -1,0 +1,120 @@
+---
+interface Props {
+  initialValue?: number;
+  step?: number;
+  min?: number;
+  max?: number;
+  label?: string;
+}
+
+const {
+  initialValue = 0,
+  step = 1,
+  min = Number.MIN_SAFE_INTEGER,
+  max = Number.MAX_SAFE_INTEGER,
+  label = 'Counter'
+} = Astro.props;
+---
+
+<div class="counter-container p-4 border rounded-md shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700 my-4">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-lg font-medium">{label}</h3>
+    <span class="counter-value px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-md" data-value={initialValue}>
+      {initialValue}
+    </span>
+  </div>
+  <div class="flex space-x-2">
+    <button
+      type="button"
+      class="decrement-btn px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-label="Decrement"
+      data-step={step}
+      data-min={min}
+    >
+      -
+    </button>
+    <button
+      type="button"
+      class="increment-btn px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-label="Increment"
+      data-step={step}
+      data-max={max}
+    >
+      +
+    </button>
+    <button
+      type="button"
+      class="reset-btn px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 ml-auto"
+      aria-label="Reset"
+      data-initial-value={initialValue}
+    >
+      Reset
+    </button>
+  </div>
+</div>
+
+<script>
+  // Initialize all counters on the page
+  function initializeCounters() {
+    document.querySelectorAll('.counter-container').forEach(container => {
+      const valueDisplay = container.querySelector('.counter-value');
+      const decrementBtn = container.querySelector('.decrement-btn');
+      const incrementBtn = container.querySelector('.increment-btn');
+      const resetBtn = container.querySelector('.reset-btn');
+      
+      if (!valueDisplay || !decrementBtn || !incrementBtn || !resetBtn) return;
+      
+      // Get initial values from data attributes
+      const initialValue = parseInt(resetBtn.getAttribute('data-initial-value') || '0', 10);
+      const step = parseInt(incrementBtn.getAttribute('data-step') || '1', 10);
+      const min = parseInt(decrementBtn.getAttribute('data-min') || String(Number.MIN_SAFE_INTEGER), 10);
+      const max = parseInt(incrementBtn.getAttribute('data-max') || String(Number.MAX_SAFE_INTEGER), 10);
+      
+      // Current value
+      let currentValue = parseInt(valueDisplay.getAttribute('data-value') || '0', 10);
+      
+      // Update display and button states
+      function updateDisplay() {
+        if (valueDisplay) {
+          valueDisplay.textContent = String(currentValue);
+          valueDisplay.setAttribute('data-value', String(currentValue));
+        }
+        
+        // Update button disabled states
+        if (decrementBtn instanceof HTMLButtonElement) {
+          decrementBtn.disabled = currentValue <= min;
+        }
+        
+        if (incrementBtn instanceof HTMLButtonElement) {
+          incrementBtn.disabled = currentValue >= max;
+        }
+      }
+      
+      // Initialize button states
+      updateDisplay();
+      
+      // Add event listeners
+      decrementBtn.addEventListener('click', () => {
+        currentValue = Math.max(currentValue - step, min);
+        updateDisplay();
+      });
+      
+      incrementBtn.addEventListener('click', () => {
+        currentValue = Math.min(currentValue + step, max);
+        updateDisplay();
+      });
+      
+      resetBtn.addEventListener('click', () => {
+        currentValue = initialValue;
+        updateDisplay();
+      });
+    });
+  }
+
+  // Run on initial page load
+  document.addEventListener('DOMContentLoaded', initializeCounters);
+  
+  // Also run when Astro updates the page
+  document.addEventListener('astro:page-load', initializeCounters);
+  document.addEventListener('astro:after-swap', initializeCounters);
+</script>

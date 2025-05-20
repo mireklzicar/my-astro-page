@@ -1,0 +1,167 @@
+---
+interface Props {
+  headers: string[];
+  rows: (string | number | boolean | null)[][];
+  caption?: string;
+  striped?: boolean;
+  bordered?: boolean;
+  hover?: boolean;
+  compact?: boolean;
+  class?: string;
+  id?: string;
+}
+
+const {
+  headers,
+  rows,
+  caption,
+  striped = true,
+  bordered = true,
+  hover = true,
+  compact = false,
+  class: className = '',
+  id = `table-${Math.random().toString(36).substring(2, 9)}`,
+} = Astro.props;
+
+// Define classes based on props
+const tableClasses = [
+  'w-full text-left',
+  striped ? 'table-striped' : '',
+  bordered ? 'table-bordered' : '',
+  hover ? 'table-hover' : '',
+  compact ? 'table-compact' : '',
+  className
+].filter(Boolean).join(' ');
+
+// Convert table data to CSV
+function generateCSV(headers: string[], rows: (string | number | boolean | null)[][]) {
+  const csvRows = [
+    headers.join(','),
+    ...rows.map(row => row.map(cell => {
+      // Handle cells with commas by wrapping in quotes
+      const cellStr = String(cell ?? '');
+      return cellStr.includes(',') ? `"${cellStr}"` : cellStr;
+    }).join(','))
+  ];
+  return csvRows.join('\n');
+}
+
+const csvData = generateCSV(headers, rows);
+---
+
+<div class="code-block-wrapper relative my-6">
+  <div class="code-header flex justify-between items-center bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-t-lg">
+    <span class="text-xs text-gray-500 dark:text-gray-400">
+      {caption || 'table'}
+    </span>
+    <button 
+      class="download-csv-btn text-sm bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 px-2 py-1 rounded transition-colors ml-auto"
+      data-table-id={id}
+      data-csv={csvData}
+      data-filename={caption ? `${caption.replace(/\s+/g, '-').toLowerCase()}.csv` : 'table-data.csv'}
+      aria-label="Download table as CSV"
+    >
+      <span class="download-text">Download</span>
+    </button>
+  </div>
+  <div class="table-container overflow-x-auto bg-white dark:bg-gray-900 rounded-b-lg">
+    <table class={`${tableClasses} rounded-t-none m-0`} id={id}>
+      <thead>
+        <tr>
+          {headers.map(header => (
+            <th class="px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold">{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(row => (
+          <tr>
+            {row.map(cell => (
+              <td class="px-4 py-2 border-t dark:border-gray-700">{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Initialize download CSV buttons
+  function initDownloadButtons() {
+    const downloadButtons = document.querySelectorAll('.download-csv-btn');
+    
+    downloadButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const csvData = button.getAttribute('data-csv') || '';
+        const filename = button.getAttribute('data-filename') || 'table-data.csv';
+        const downloadText = button.querySelector('.download-text');
+        
+        // Create a blob and download link
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show feedback
+        if (downloadText) {
+          downloadText.textContent = 'Downloaded!';
+          setTimeout(() => {
+            downloadText.textContent = 'Download';
+          }, 2000);
+        }
+      });
+    });
+  }
+
+  // Run on initial load
+  initDownloadButtons();
+
+  // Also run when the DOM content is loaded (for client-side navigation)
+  document.addEventListener('DOMContentLoaded', initDownloadButtons);
+
+  // For Astro view transitions
+  document.addEventListener('astro:page-load', initDownloadButtons);
+</script>
+
+<style>
+  /* Table styling */
+  .table-striped tr:nth-child(even) {
+    @apply bg-gray-50 dark:bg-gray-800/50;
+  }
+  
+  .table-bordered {
+    @apply border border-gray-200 dark:border-gray-700;
+  }
+  
+  .table-bordered th,
+  .table-bordered td {
+    @apply border border-gray-200 dark:border-gray-700;
+  }
+  
+  .table-hover tr:hover {
+    @apply bg-gray-100 dark:bg-gray-700/50;
+  }
+  
+  .table-compact th,
+  .table-compact td {
+    @apply px-2 py-1;
+  }
+  
+  /* Ensure the table container has proper styling */
+  .table-container {
+    @apply border border-gray-200 dark:border-gray-700 border-t-0;
+  }
+  
+  /* Ensure the table fills the container */
+  .table-container table {
+    width: 100%;
+  }
+</style>

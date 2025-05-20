@@ -1,0 +1,98 @@
+---
+interface Props {
+  type: 'fade' | 'slide' | 'bounce' | 'pulse' | 'spin';
+  duration?: number; // in seconds
+  delay?: number; // in seconds
+  iterations?: number | 'infinite';
+  direction?: 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
+  timing?: 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'linear';
+  class?: string;
+}
+
+const {
+  type,
+  duration = 1,
+  delay = 0,
+  iterations = 1,
+  direction = 'normal',
+  timing = 'ease',
+  class: className = '',
+} = Astro.props;
+
+// Define animation keyframes based on type
+const animationTypes = {
+  fade: 'fade',
+  slide: 'slide',
+  bounce: 'bounce',
+  pulse: 'pulse',
+  spin: 'spin'
+};
+
+const animationStyle = `
+  animation-name: ${animationTypes[type]};
+  animation-duration: ${duration}s;
+  animation-delay: ${delay}s;
+  animation-iteration-count: ${iterations};
+  animation-direction: ${direction};
+  animation-timing-function: ${timing};
+  animation-fill-mode: both;
+`;
+---
+
+<div class={`animation ${className}`} style={animationStyle}>
+  <slot />
+</div>
+
+<script>
+  // This script ensures animations work properly with client-side navigation
+  document.addEventListener('astro:page-load', () => {
+    // Reset animations by removing and re-adding the animation class
+    document.querySelectorAll('.animation').forEach(element => {
+      const style = element.getAttribute('style');
+      if (style) {
+        element.setAttribute('style', '');
+        setTimeout(() => {
+          element.setAttribute('style', style);
+        }, 10);
+      }
+    });
+  });
+</script>
+
+<style is:global>
+  /* Animation keyframes */
+  @keyframes fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes slide {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-30px); }
+    60% { transform: translateY(-15px); }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Ensure animations work properly */
+  .animation {
+    display: inline-block;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+</style>

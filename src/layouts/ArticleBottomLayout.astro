@@ -1,5 +1,12 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content"
+import MDXComponents from "@components/MDXComponents.astro"
+
+interface MarkdownHeading {
+  depth: number;
+  slug: string;
+  text: string;
+}
 
 type Props = {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects"> | CollectionEntry<"publications"> | CollectionEntry<"talks">
@@ -15,9 +22,11 @@ const showToc = 'toc' in entry.data && entry.data.toc === true
 
 // Get the next and prev entries (modulo to wrap index)
 const items = (await getCollection(collection))
-  .filter(post => !post.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-const index = items.findIndex(x => x.slug === entry.slug)
+  .filter((post: CollectionEntry<typeof collection>) => !post.data.draft)
+  .sort((a: CollectionEntry<typeof collection>, b: CollectionEntry<typeof collection>) => 
+    b.data.date.getTime() - a.data.date.getTime()
+  )
+const index = items.findIndex((x: CollectionEntry<typeof collection>) => x.slug === entry.slug)
 const prev = items[(index - 1 + items.length) % items.length]
 const next = items[(index + 1) % items.length]
 ---
@@ -25,25 +34,72 @@ const next = items[(index + 1) % items.length]
 <div>
   <article>
     {showToc && headings.length > 0 && (
-      <div class="toc-container mb-8 p-4 border border-black/15 dark:border-white/20 rounded-lg">
-        <h2 class="text-xl font-semibold mb-4">Table of Contents</h2>
-        <ul class="space-y-2">
-          {headings
-            .filter(heading => heading.depth <= 3) // Only include h1, h2, h3
-            .map(heading => (
-              <li class={`toc-item toc-level-${heading.depth}`} style={`margin-left: ${(heading.depth - 1) * 1.5}rem`}>
-                <a href={`#${heading.slug}`} class="hover:text-black dark:hover:text-white hover:underline blend">
-                  {heading.text}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+      <div class="toc-container mb-8 border border-black/15 dark:border-white/20 rounded-lg">
+        <button id="toc-toggle" class="w-full flex justify-between items-center p-4 hover:bg-black/5 hover:dark:bg-white/10 transition-colors duration-300 ease-in-out">
+          <span class="font-medium">Contents</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-chevron transition-transform duration-300">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div id="toc-content" class="px-4 pb-4 pt-0">
+          <ul class="space-y-2">
+            {headings
+              .filter((heading: MarkdownHeading) => heading.depth <= 3)
+              .map((heading: MarkdownHeading) => (
+                <li class={`toc-item toc-level-${heading.depth}`} style={`margin-left: ${(heading.depth - 1) * 1.5}rem`}>
+                  <a href={`#${heading.slug}`} class="no-underline hover:text-black dark:hover:text-white hover:underline blend">
+                    {heading.text}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </div>
+      <script>
+        function initTocToggle() {
+          const tocToggle = document.getElementById('toc-toggle');
+          const tocContent = document.getElementById('toc-content');
+          const tocChevron = document.querySelector('.toc-chevron');
+          
+          if (tocToggle && tocContent) {
+            // Set initial state (expanded)
+            let isExpanded = true;
+            
+            tocToggle.addEventListener('click', () => {
+              isExpanded = !isExpanded;
+              
+              if (isExpanded) {
+                if (tocContent) tocContent.style.display = 'block';
+                if (tocChevron && tocChevron instanceof HTMLElement) {
+                  tocChevron.style.transform = 'rotate(0deg)';
+                }
+              } else {
+                if (tocContent) tocContent.style.display = 'none';
+                if (tocChevron && tocChevron instanceof HTMLElement) {
+                  tocChevron.style.transform = 'rotate(-180deg)';
+                }
+              }
+            });
+          }
+        }
+        
+        // Run on initial load
+        initTocToggle();
+        
+        // Also run when the DOM content is loaded (for client-side navigation)
+        document.addEventListener('DOMContentLoaded', initTocToggle);
+        
+        // For Astro view transitions
+        document.addEventListener('astro:page-load', initTocToggle);
+      </script>
     )}
-    <Content/>
+    <MDXComponents>
+      <Content />
+    </MDXComponents>
   </article>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
     <a href={`/${prev.collection}/${prev.slug}`} class="group p-4 gap-3 flex items-center border rounded-lg hover:bg-black/5 hover:dark:bg-white/10 border-black/15 dark:border-white/20 blend">
       <div class="order-2 w-full h-full group-hover:text-black group-hover:dark:text-white blend">
         <div class="flex flex-wrap gap-2">
