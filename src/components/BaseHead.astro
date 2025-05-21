@@ -53,18 +53,23 @@ const { title, description, image = "/open-graph.jpg" } = Astro.props
 <script is:inline src="/js/scroll.js"></script>
 <script is:inline src="/js/animate.js"></script>
 
-<!-- Google Analytics -->
-<script is:inline type="text/partytown" async src="https://www.googletagmanager.com/gtag/js?id=G-KH5NXR3L16"></script>
-<script is:inline type="text/partytown">
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+<!-- Analytics (disabled on localhost) -->
+{Astro.url.hostname !== 'localhost' && Astro.url.hostname !== '127.0.0.1' && (
+  <>
+    <!-- Google Analytics -->
+    <script is:inline type="text/partytown" async src="https://www.googletagmanager.com/gtag/js?id=G-KH5NXR3L16"></script>
+    <script is:inline type="text/partytown">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-KH5NXR3L16');
-</script>
+      gtag('config', 'G-KH5NXR3L16');
+    </script>
 
-<!-- Umami Analytics -->
-<script defer src="https://cloud.umami.is/script.js" data-website-id="34907c39-0508-4f7a-bcd5-f39cd03d9c3b"></script>
+    <!-- Umami Analytics -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="34907c39-0508-4f7a-bcd5-f39cd03d9c3b"></script>
+  </>
+)}
 
 <!-- <ViewTransitions  /> -->
 
