@@ -1,0 +1,184 @@
+---
+title: "Ketcher Docker: Production-Ready Chemical Structure Editor"
+summary: "A dockerized deployment of EPAM's Ketcher chemical structure editor with iframe communication API, React 19, and production-ready configuration for seamless integration into web applications."
+date: "Jun 07 2025"
+draft: false
+category: tech
+tags:
+- Docker
+- Chemical Informatics
+- React
+- TypeScript
+- Iframe Integration
+- Vite
+thumbnail: ketcher.png
+demoUrl: https://ketcher.mireklzicar.com/
+githubUrl: https://github.com/miroslav-lzicar/ketcher-docker
+toc: true
+---
+
+Chemical structure editors are essential tools in computational chemistry and drug discovery workflows. While there are several options available, [Ketcher](https://lifescience.opensource.epam.com/ketcher/) by EPAM Life Sciences stands out as a powerful, open-source web-based solution. However, deploying it in a production environment with proper iframe communication can be challenging.
+
+I've created **Ketcher Docker** — a production-ready deployment that wraps Ketcher 3.2.0 in a modern React 19 + TypeScript + Vite application with full iframe communication support and Docker containerization.
+
+## Live Demo
+
+Try the chemical structure editor below. You can draw molecules, import SMILES, and export structures:
+
+```html
+<div style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin: 20px 0;">
+  <iframe
+    src="https://ketcher.mireklzicar.com/"
+    width="100%"
+    height="100%"
+    title="Ketcher Chemical Structure Editor"
+    style="border: none;"
+  />
+</div>
+```
+Which renders on a webpage, html or markdown as:
+
+<div style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin: 20px 0;">
+  <iframe
+    src="https://ketcher.mireklzicar.com/"
+    width="100%"
+    height="100%"
+    title="Ketcher Chemical Structure Editor"
+    style="border: none;"
+  />
+</div>
+
+*Live Ketcher instance running at [ketcher.mireklzicar.com](https://ketcher.mireklzicar.com)*
+
+## Key Features
+
+### 🧪 **Modern Stack**
+- **React 19** with TypeScript for type safety
+- **Vite** for fast development and optimized builds
+- **Ketcher 3.2.0** — latest stable release
+
+### 🔌 **Iframe Communication API**
+Complete [`postMessage`](src/App.tsx:45) API for bidirectional communication:
+
+```javascript
+// Set molecule from SMILES
+iframe.contentWindow.postMessage({
+  type: 'setMolecule',
+  payload: 'CCO'  // ethanol
+}, '*');
+
+// Get current structure
+iframe.contentWindow.postMessage({
+  type: 'getSmiles'
+}, '*');
+
+// Listen for responses
+window.addEventListener('message', (event) => {
+  const { type, payload } = event.data;
+  if (type === 'smiles') {
+    console.log('Current SMILES:', payload);
+  }
+});
+```
+
+### 🐳 **Production-Ready Docker**
+Multi-stage Docker build with optimized Nginx configuration:
+- SPA routing support
+- CORS headers for iframe embedding
+- Gzip compression and asset caching
+- Removed X-Frame-Options for cross-origin embedding
+
+### 📱 **Mobile-Friendly**
+Fixed touch screen keyboard trigger issues on mobile devices, making it usable across all platforms.
+
+## Technical Implementation
+
+The core challenge was bridging Ketcher's internal API with a clean iframe communication layer. The [`App.tsx`](src/App.tsx:1) component initializes Ketcher with a standalone service provider and establishes [`postMessage`](src/App.tsx:67) listeners:
+
+```typescript
+useEffect(() => {
+  window.addEventListener('message', handleMessage);
+  return () => window.removeEventListener('message', handleMessage);
+}, []);
+
+const handleMessage = async (event: MessageEvent) => {
+  const { type, payload } = event.data;
+  
+  switch (type) {
+    case 'setMolecule':
+      await ketcher.setMolecule(payload);
+      sendMessage('moleculeSet');
+      break;
+    case 'getSmiles':
+      const smiles = await ketcher.getSmiles();
+      sendMessage('smiles', smiles);
+      break;
+  }
+};
+```
+
+## Deployment Options
+
+### Docker (Recommended)
+```bash
+docker build -t ketcher-docker-app .
+docker run -d -p 8080:80 ketcher-docker-app
+```
+
+### Vercel
+The project includes [`vercel.json`](vercel.json:1) configuration for seamless deployment:
+```bash
+vercel --prod
+```
+
+### Local Development
+```bash
+pnpm install && pnpm dev
+```
+
+## Why This Matters
+
+Chemical structure editors are notoriously difficult to integrate into larger applications. Most solutions require complex backend setups or lack proper iframe support. This project solves those problems by providing:
+
+1. **Zero backend dependencies** — runs entirely client-side
+2. **Clean API** — simple postMessage interface
+3. **Production readiness** — Docker containerization with proper CORS
+4. **Modern tooling** — Vite build system with TypeScript
+
+## Attribution & Licensing
+
+This project redistributes [Ketcher](https://github.com/epam/ketcher) under the Apache License 2.0. It's an independent deployment with custom enhancements, not affiliated with EPAM Systems.
+
+The combination of Ketcher's powerful chemical editing capabilities with modern web deployment practices creates a tool that's both scientifically robust and developer-friendly. Whether you're building a drug discovery platform, chemical database interface, or educational application, this Docker deployment provides a solid foundation.
+
+## Citation
+Please cite this work as:
+
+```
+Lžičař, Miroslav. "Ketcher Docker - Chemical Structure Editor Docker Deployment". GitHub (2025). https://github.com/miroslav-lzicar/ketcher-docker
+```
+
+Or use the BibTex citations:
+
+```bibtex
+@misc{ketcher-docker,
+  title        = {Ketcher Docker - Chemical Structure Editor Docker Deployment},
+  author       = {Miroslav Lžičař},
+  year         = {2025},
+  howpublished = {\url{https://github.com/miroslav-lzicar/ketcher-docker}},
+  note         = {Accessed: 2025-06-07}
+}
+
+@misc{ketcher,
+  title        = {Ketcher: Web-based Chemical Structure Editor},
+  author       = {{EPAM Systems}},
+  year         = {2025},
+  howpublished = {\url{https://github.com/epam/ketcher}},
+  note         = {Accessed: 2025-06-07}
+}
+```
+
+**Links:**
+- [Live Demo](https://ketcher.mireklzicar.com)
+- [GitHub Repository](https://github.com/miroslav-lzicar/ketcher-docker)
+- [Original Ketcher Project](https://github.com/epam/ketcher)

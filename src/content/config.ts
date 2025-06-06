@@ -62,6 +62,7 @@ const blog = defineCollection({
     category: z.enum(["tech", "personal"]).default("tech"),
     draft: z.boolean().optional(),
     thumbnail: z.string().optional(),
+    demoUrl: z.string().optional(),
     originalUrl: z.string().optional(),
     readMoreUrl: z.string().optional(),
     pdfUrl: z.string().optional(),
