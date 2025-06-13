@@ -38,8 +38,21 @@ function generateCSV(headers: string[], rows: (string | number | boolean | null)
   const csvRows = [
     headers.join(','),
     ...rows.map(row => row.map(cell => {
+      let cellStr = String(cell ?? '');
+      
+      // If cell contains HTML, extract just the text content
+      if (cellStr.includes('<')) {
+        // Extract href from anchor tags if present
+        const hrefMatch = cellStr.match(/href=['"]([^'"]*)['"]/);
+        if (hrefMatch) {
+          cellStr = hrefMatch[1]; // Use the URL from href
+        } else {
+          // Strip HTML tags for other cases
+          cellStr = cellStr.replace(/<[^>]*>/g, '');
+        }
+      }
+      
       // Handle cells with commas by wrapping in quotes
-      const cellStr = String(cell ?? '');
       return cellStr.includes(',') ? `"${cellStr}"` : cellStr;
     }).join(','))
   ];
@@ -76,9 +89,14 @@ const csvData = generateCSV(headers, rows);
       <tbody>
         {rows.map(row => (
           <tr>
-            {row.map(cell => (
-              <td class="px-4 py-2 border-t dark:border-gray-700">{cell}</td>
-            ))}
+            {row.map(cell => {
+              const cellContent = String(cell ?? '');
+              if (cellContent.includes('<')) {
+                return <td class="px-4 py-2 border-t dark:border-gray-700" set:html={cellContent}></td>;
+              } else {
+                return <td class="px-4 py-2 border-t dark:border-gray-700">{cellContent}</td>;
+              }
+            })}
           </tr>
         ))}
       </tbody>

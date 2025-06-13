@@ -14,6 +14,7 @@ tags:
 - Vite
 - Streamlit
 - Dash
+- Plotly
 - Python 
 - Tailwind
 thumbnail: cheese_float.png
@@ -26,27 +27,27 @@ import Citation from '@components/Citation.astro';
 import Cite from '@components/Cite.astro';
 
 
-When I wrote my first line of code as a kid, it was probably a script to self‑host a Minecraft server, a program for a LEGO robot written in C, a Linux Bash script, or a bit of Java in Processing. Later, I relied heavily on Python and Jupyter Notebooks for data analysis. Web or frontend? I wasn’t interested at all—it felt *so boring*.
+When I wrote my first line of code as a kid, it was probably a script to self‑host a Minecraft server, a program for a LEGO robot written in C, a Linux Bash script, or a bit of Java in Processing. Later, I relied heavily on Python and Jupyter Notebooks for data analysis. Web or frontend? I wasn’t interested at all—it felt *so boring*. I was wondering, how many talented people are stuck doing this and if it requires the degree in computer science they have.
 
-In my first full‑stack job I programmed in Flask, using Jinja templates and Bootstrap. It worked up to a point, but every time I needed to go beyond what the templates provided, it was a pain in the ass. In later projects I usually used a combination of Streamlit, Dash, and Flask. Most of the time I picked the *lowest‑friction* toolset, crafting the frontend out of necessity, not because I enjoyed it. To be fair, I was more of a backend developer, so it wasn't expected from me.
+Long story short, in my first full-stack job I programmed in Python and Flask<Cite id="flaskDocs" />, making a simple UI using Jinja templates and Bootstrap. It worked up to a point, but every time I needed to go beyond what the templates provided, it was a pain in the ass. In later projects I usually used a combination of Streamlit<Cite id="streamlitDocs" />, Dash<Cite id="dashDocs" />, and Flask. Most of the time I picked the *lowest‑friction* toolset, crafting the frontend out of necessity, not because I enjoyed it. To be fair, I was more of a backend developer, so it wasn't expected from me.
 
-Last fall I skimmed through some React basics and soon fell in love. Now I consider myself a proficient frontend vibecoder. Before I outsource the UI to someone more experienced, I want to enjoy it for a while–even for an amateur–it feels so satisfying.
+Last fall I skimmed through some React<Cite id="reactDocs" /> basics and soon fell in love. Now I consider myself a proficient frontend vibecoder. Before I outsource the UI to someone more experienced, I want to enjoy it for a while–even for an amateur–it feels so satisfying.
 
 ![](cheese_float.png)
 *Example: [CHEESE Search](https://cheese-new.deepmedchem.com) UI I wrote in React.*
 
 ## My frontend stack now at Deep MedChem
 
-Let's jump to the present. You can see a lineup from Streamlit prototypes (such as Electrostatics or Modeller) to a Flask + Dash dashboard in Explorer, up to the UI I'm currently most proud of: CHEESE Search.
+Let's jump to the present. As a case study (and to boost our PR) I will go through apps I did at my current job. You can see a lineup from Streamlit prototypes (such as Electrostatics or Modeller) to a Flask + Dash dashboard in Explorer, up to the UI I'm currently most proud of: CHEESE Search.
 
 <Table
   headers={["Product", "Stack", "Website"]}
   rows={[
-    ["CHEESE", "React + TypeScript + Vite + Tailwind", "https://cheese-new.deepmedchem.com"],
-    ["Explorer", "Flask + Python + Dash + HTML/CSS", "https://explorer.deepmedchem.com/"],
-    ["Electrostatics", "Streamlit + Python", "http://electrostatics.deepmedchem.com/"],
-    ["Modeller", "Streamlit + Python", "http://modeller.deepmedchem.com/"],
-    ["Deep MedChem", "Webflow", "https://deepmedchem.com/"]
+    ["CHEESE", "React + TypeScript + Vite + Tailwind", "<a href='https://cheese-new.deepmedchem.com'>cheese-new.deepmedchem.com</a>"],
+    ["Explorer", "Flask + Python + Dash + HTML/CSS", "<a href='https://explorer.deepmedchem.com/'>explorer.deepmedchem.com</a>"],
+    ["Electrostatics", "Streamlit + Python", "<a href='http://electrostatics.deepmedchem.com/'>electrostatics.deepmedchem.com</a>"],
+    ["Modeller", "Streamlit + Python", "<a href='http://modeller.deepmedchem.com/'>modeller.deepmedchem.com</a>"],
+    ["Deep MedChem", "Webflow", "<a href='https://deepmedchem.com/'>deepmedchem.com</a>"]
   ]}
   striped={true}
   bordered={true}
@@ -55,17 +56,17 @@ Let's jump to the present. You can see a lineup from Streamlit prototypes (such 
 
 ## Which technology to choose?
 
-I have no strong opinion about what is better: the right approach is to know what you the end-product should be. 
+I have no strong opinion about what is better: the right approach is to know what the end-product should be. 
 
 * Need an MVP overnight? Pick Streamlit.
-* Hassle‑free CRUD with SQL? Use Flask + SQLAlchemy.
-* Production‑grade, highly maintainable UI, even if it takes twice as long to write and type‑check? Go for React + TypeScript. 
+* Hassle‑free CRUD with SQL? Use Flask<Cite id="flaskDocs" /> + SQLAlchemy.
+* Production‑grade, highly maintainable UI, even if it takes twice as long to write and type‑check? Go for React<Cite id="reactDocs" /> + TypeScript.
 
 ## Simple vs Complicated: What I hate in modern web dev
 
-What intimidated me during my first React “Hello World” was the sheer number of files. While most developer tools get simpler year after year, web dev seems to have become 10x more convoluted compared with the days when HTML, PHP, and CSS were enough.
+What intimidated me during my first React<Cite id="reactDocs" /> "Hello World" was the sheer number of files. While most developer tools get simpler year after year, web dev seems to have become 10x more convoluted compared with the days when HTML, PHP, and CSS were enough.
 
-To illustrate my point, take how it looks after you create a new, say, NextJS project (excluding gitignored files):
+To illustrate my point, take how it looks after you create a new, say, NextJS<Cite id="nextjsDocs" /> project (excluding gitignored files):
 
 ```
 └── hello_world
@@ -103,35 +104,39 @@ import streamlit as st
 st.title("Hello, world! 👋")
 ```
 
-## Distinction between dashboards and webpages
+## Distinction between dashboards, widgets and webpages
 
+Since some of the apps I did contained complex plots or another interactive data visualisation or graphing elements, I soon learned it is a good idea to separate a webpage project from a dashboard or widget project. For instance Plotly or Dash allows you to craft pages full of interactive elements, ideally with realtime updates as well, but you usually cannot make a fullblown app in say Dash. If you try to integrate these two, often the javascript needed for the interactive plots will turn out to be too bulky to integrate with your web app while keeping the build size and page load speed below some reasonable limit. In that case, it might be better to deploy the dashboard or widget separetely and then use as an iframe in your main app.
 
+![](explorer.png)
+*Example: [Explorer](https://explorer.deepmedchem.com) An app for interactive visualisation written in Dash. Supports fancy interactive plots in 2D as well as 3D.*
 
 ## When streamlit is (not)enough
 
-If you have a simple usecase: an app with three buttons and a table, chat window, simple plotting dashboard, deployment od an AI model from huggingface or a search bar and results, in almost all the cases streamlit (or gradio or other such frameworks) will serve the purpose well. Again: what you get just for few lines of code is unparalleled.
+If you have a simple usecase: an app with three buttons and a table, chat window, simple plotting dashboard, deployment of an AI model from huggingface or a search bar and results, in almost all the cases streamlit (or gradio or other such frameworks) will serve the purpose well. Again: what you get just for few lines of code is unparalleled.
 
 ![](electrostatics.avif) 
-*Example: [Electrostatics](https://cheese-new.deepmedchem.com) A streamlit UI for molecule partial charges.*
+*Example: [Electrostatics](https://electrostatics.deepmedchem.com) A streamlit UI for molecule partial charges.*
 
 However, the darkside of such an easy way to make a frontend is that these *relatively new* frameworks are still a bit experimental and glitchy or buggy time to time. For instance streamlit is not so well suited for interactivity and sometimes flickers or displays ghost components. There are some deeper technological reasons why it is not so easy (or maybe currently close to impossible) to generalize this paradigm and simplify all web development using this approach. I am not going to dive into it here. 
 
-*Tip: Checkout the [Streamlit App Gallery](https://streamlit.io/gallery?category=favorites) to get a gist of what it can do.*
+*Tip: Checkout the Streamlit App Gallery<Cite id="streamlitGallery" /> to get a gist of what it can do.*
 
 ![](database-selection.png)
 *This [CHEESE Search](https://cheese-new.deepmedchem.com) database selection widget with a slider and a multiselect wouldn't be a huge problem to replicate in streamlit*
 
 ## Where I ended up
 
-Currently my go-to stack when creating a new app consist of Vite and Express (as a proxy server) where I write in React/Typescript, Tailwind CSS and usually Shadcn-UI as a component library. Sometimes I am trying new things. for instance this blog page is written in Astro JS and in other projects I have encountered as well NextJS or Vue (though i have no experience with them).
+Currently my go-to stack when creating a new app consist of Vite<Cite id="viteDocs" /> and Express (as a proxy server) where I write in React/Typescript, Tailwind CSS<Cite id="tailwindDocs" /> and usually Shadcn-UI<Cite id="shadcnUi" /> as a component library. Sometimes I am trying new things. for instance this blog page is written in Astro JS and in other projects I have encountered as well NextJS<Cite id="nextjsDocs" /> or Vue (though i have no experience with them).
 
 ![](draw-molecule.png)
 *[CHEESE Search](https://cheese-new.deepmedchem.com) Ketcher drawing pad with search bar and some buttons*
 
-## Vibe-coding tips
+{/* ## Vibe-coding tips
 
-Tailwind CSS is a life-hack if you are using GPT to help you design your page. Large language models have sometimes a problem remember long context or making edits in multiple files at once and having inline css simplifies this a lot. Typescript is also a must-have, because it prevents LLMs introducting easily-preventable bugs and force them to be type consistent accross the whole codebase.
-At this time point (June 2025) I still don't find LLMs 100% useful in large typescript codebases. A month ago I was still manually selecting code snippets from the relevant files and copy-pasting them to another window with LLM chat opened, then I checked the generated results and inserted them manually back. Only recently I started to play with tools such as Roo Code or Aider.
+Tailwind CSS<Cite id="tailwindDocs" /> is a life-hack if you are using GPT to help you design your page. Large language models have sometimes a problem remember long context or making edits in multiple files at once and having inline css simplifies this a lot. Typescript is also a must-have, because it prevents LLMs introducting easily-preventable bugs and force them to be type consistent accross the whole codebase.
+
+At this time point (June 2025) I don't find LLMs 100% useful in medium to large typescript codebases. Few weeks ago I was still manually selecting code snippets from the relevant files and copy-pasting them to another window with LLM chat opened, then I checked the generated results and inserted them back, all of it while writing significant parts of the code by hand. Only recently I started to play with tools such as Roo Code<Cite id="rooCode" /> or Aider<Cite id="aider" /> – I haven't yet got fully used to it, but I strongly believe it will sooner or later make frontend coding a thing of a past, maybe taking out the human feeling of satisfaction when a code typed line by line using your fingers and a keyboard finally works. */}
 
 
 <References title="References">
