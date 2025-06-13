@@ -1,9 +1,8 @@
 ---
-
 title: "My Flight from Flask to React, via Streamlit and Dash"
 summary: "Web pages used to feel like the most boring part of programming—until I discovered React. In this post I reflect on my coding journey from the backend to the frontend."
 date: "June 13 2025"
-draft: true
+draft: false
 category: tech
 tags:
 - React
@@ -39,6 +38,8 @@ Last fall I skimmed through some React<Cite id="reactDocs" /> basics and soon fe
 ## My frontend stack now at Deep MedChem
 
 Let's jump to the present. As a case study (and to boost our PR) I will go through apps I did at my current job. You can see a lineup from Streamlit prototypes (such as Electrostatics or Modeller) to a Flask + Dash dashboard in Explorer, up to the UI I'm currently most proud of: CHEESE Search.
+
+CHEESE (CHEmical Embeddings Search Engine) is a fast, scalable platform for 3D molecular similarity search across billions of compounds—think searching through chemical databases containing 5.5 billion molecules in under 5 seconds. It reformulates molecular similarity as a vector space problem, enabling up to 1000× faster screening than traditional methods like ROCS or docking. The complexity of handling real-time searches across massive datasets, combined with advanced molecular drawing interfaces and multi-database querying, made it the perfect candidate for a React-based frontend.
 
 <Table
   headers={["Product", "Stack", "Website"]}
@@ -106,19 +107,23 @@ st.title("Hello, world! 👋")
 
 ## Distinction between dashboards, widgets and webpages
 
-Since some of the apps I did contained complex plots or another interactive data visualisation or graphing elements, I soon learned it is a good idea to separate a webpage project from a dashboard or widget project. For instance Plotly or Dash allows you to craft pages full of interactive elements, ideally with realtime updates as well, but you usually cannot make a fullblown app in say Dash. If you try to integrate these two, often the javascript needed for the interactive plots will turn out to be too bulky to integrate with your web app while keeping the build size and page load speed below some reasonable limit. In that case, it might be better to deploy the dashboard or widget separetely and then use as an iframe in your main app.
+Since some of the apps I did contained complex plots or interactive data visualization elements, I learned it's crucial to separate webpage projects from dashboard projects. For instance, Plotly or Dash excel at creating pages full of interactive elements with real-time updates, but you usually cannot make a full-blown app in Dash alone.
+
+The integration problem becomes clear when you consider the technical constraints: Plotly.js alone is ~3MB minified, and Dash adds another ~2MB of dependencies. When you try to embed these into a React app, you're looking at 5+ MB just for charting—before your actual application code. This severely impacts page load times, especially on mobile networks. Additionally, Dash's callback system conflicts with React's state management, leading to unpredictable re-renders and memory leaks.
+
+For CHEESE Search, I initially tried embedding Plotly charts directly into the React interface for molecular similarity visualizations. The bundle size ballooned to 8MB, and the molecular drawing interface (Ketcher) started glitching due to conflicting event handlers. The solution was to deploy our 3D molecular viewers as separate Dash applications and embed them as iframes, keeping the main React app lightweight while preserving the interactive functionality.
 
 ![](explorer.png)
 *Example: [Explorer](https://explorer.deepmedchem.com) An app for interactive visualisation written in Dash. Supports fancy interactive plots in 2D as well as 3D.*
 
-## When streamlit is (not)enough
+## When Streamlit is (not) enough
 
-If you have a simple usecase: an app with three buttons and a table, chat window, simple plotting dashboard, deployment of an AI model from huggingface or a search bar and results, in almost all the cases streamlit (or gradio or other such frameworks) will serve the purpose well. Again: what you get just for few lines of code is unparalleled.
+If you have a simple use case: an app with three buttons and a table, chat window, simple plotting dashboard, deployment of an AI model from Hugging Face or a search bar and results, in almost all cases Streamlit (or Gradio or other such frameworks) will serve the purpose well. Again: what you get just for a few lines of code is unparalleled.
 
 ![](electrostatics.avif) 
 *Example: [Electrostatics](https://electrostatics.deepmedchem.com) A streamlit UI for molecule partial charges.*
 
-However, the darkside of such an easy way to make a frontend is that these *relatively new* frameworks are still a bit experimental and glitchy or buggy time to time. For instance streamlit is not so well suited for interactivity and sometimes flickers or displays ghost components. There are some deeper technological reasons why it is not so easy (or maybe currently close to impossible) to generalize this paradigm and simplify all web development using this approach. I am not going to dive into it here. 
+However, the dark side of such an easy way to make a frontend is that these *relatively new* frameworks are still somewhat experimental and can be glitchy or buggy at times. For instance, Streamlit is not well-suited for complex interactivity and sometimes flickers or displays ghost components. There are deeper technological reasons why it's difficult (or maybe currently impossible) to generalize this paradigm and simplify all web development using this approach—mainly because these frameworks abstract away too much control over the DOM and state management.
 
 *Tip: Checkout the Streamlit App Gallery<Cite id="streamlitGallery" /> to get a gist of what it can do.*
 
@@ -127,16 +132,36 @@ However, the darkside of such an easy way to make a frontend is that these *rela
 
 ## Where I ended up
 
-Currently my go-to stack when creating a new app consist of Vite<Cite id="viteDocs" /> and Express (as a proxy server) where I write in React/Typescript, Tailwind CSS<Cite id="tailwindDocs" /> and usually Shadcn-UI<Cite id="shadcnUi" /> as a component library. Sometimes I am trying new things. for instance this blog page is written in Astro JS and in other projects I have encountered as well NextJS<Cite id="nextjsDocs" /> or Vue (though i have no experience with them).
+My go-to stack when creating a new app consists of Vite<Cite id="viteDocs" />, Express<Cite id="expressDocs" /> and React/TypeScript, usually enhanced by Tailwind CSS<Cite id="tailwindDocs" /> and Shadcn-UI<Cite id="shadcnUi" /> as a component library. Sometimes I'm trying new things: for instance this blog page is written in Astro<Cite id="astroDocs" /> and in other projects I have encountered Next.js<Cite id="nextjsDocs" /> or Vue<Cite id="vueDocs" /> (though I have no experience with them).
 
 ![](draw-molecule.png)
 *[CHEESE Search](https://cheese-new.deepmedchem.com) Ketcher drawing pad with search bar and some buttons*
 
-{/* ## Vibe-coding tips
+## Specific challenges React/TypeScript solved for me
 
-Tailwind CSS<Cite id="tailwindDocs" /> is a life-hack if you are using GPT to help you design your page. Large language models have sometimes a problem remember long context or making edits in multiple files at once and having inline css simplifies this a lot. Typescript is also a must-have, because it prevents LLMs introducting easily-preventable bugs and force them to be type consistent accross the whole codebase.
+The transition to React/TypeScript wasn't just about preference—it solved real problems I faced while building:
 
-At this time point (June 2025) I don't find LLMs 100% useful in medium to large typescript codebases. Few weeks ago I was still manually selecting code snippets from the relevant files and copy-pasting them to another window with LLM chat opened, then I checked the generated results and inserted them back, all of it while writing significant parts of the code by hand. Only recently I started to play with tools such as Roo Code<Cite id="rooCode" /> or Aider<Cite id="aider" /> – I haven't yet got fully used to it, but I strongly believe it will sooner or later make frontend coding a thing of a past, maybe taking out the human feeling of satisfaction when a code typed line by line using your fingers and a keyboard finally works. */}
+**State Management Complexity**: CHEESE handles multiple simultaneous search queries across different databases (Enamine REAL, eXplore, ZINC15, etc.). In Flask, I would manually manage search state with session variables and encounter race conditions with multiple searches. React's component state and useEffect hooks made it trivial to handle concurrent searches with proper cleanup.
+
+**Type Safety**: With CHEESE dealing with complex molecular data structures (SMILES strings, similarity scores, vendor information), TypeScript caught dozens of bugs before they reached production. For example, when integrating multiple chemical databases with different response schemas, TypeScript forced me to handle all possible data formats explicitly.
+
+**Component Reusability**: The molecular drawing interface (Ketcher integration), database selection widgets, and similarity score displays are now reusable components. I can drop the same molecular drawing pad into different contexts without rewriting the integration logic—something that would be impossible without clever iframing and component architecture.
+
+**Real-time Updates**: CHEESE search results stream in as they're computed (see for instance the infinite scroll). React's state updates made it straightforward to show partial results or progress indicators and then update them, while in Flask I was stuck with either full page reloads or complex JavaScript callbacks.
+
+**Bundle Optimization**: Despite the complexity, my current CHEESE build is under 1MB gzipped thanks to Vite's tree-shaking and code splitting. That was a surprise for me: with my old habits I would expect much larger build.
+
+## Vibe-coding tips
+
+Tailwind CSS<Cite id="tailwindDocs" /> is a life-hack if you're using GPT to help you design your page. Large language models sometimes struggle remembering long context or making edits in multiple files at once, and having inline CSS simplifies this a lot. TypeScript is a must-have as well, because it prevents LLMs from introducing easily-preventable bugs and forces them to be type consistent across the whole codebase.
+
+At this point in time (June 2025) I don't find LLMs 100% useful in medium to large TypeScript codebases. A few weeks ago I was still manually selecting code snippets from relevant files and copy-pasting them to another window with LLM chat opened, then I checked the generated results and inserted them back, all while writing significant parts of the code by hand. Only recently I started to play with tools such as Roo Code<Cite id="rooCode" /> or Aider<Cite id="aider" />—I haven't yet gotten fully used to it, but I strongly believe it will sooner or later make frontend coding a thing of the past, maybe taking out the human feeling of satisfaction when code typed line by line using your fingers and a keyboard finally works.
+
+## Conclusion
+
+My journey from Flask templates to React wasn't just about following trends—it was driven by real technical needs. Building CHEESE Search taught me that the right tool depends entirely on the problem you're solving. Streamlit is perfect for prototypes, Flask handles simple CRUD well, but for complex, interactive applications dealing with real-time data and intricate user workflows, React + TypeScript provides the maintainability and developer experience that makes the extra complexity worthwhile.
+
+The frontend landscape will keep evolving, but the core principle remains: choose your tools based on what you're building, not what's fashionable. And sometimes, falling in love with a technology you once dismissed might just make you a better developer.
 
 
 <References title="References">
@@ -182,5 +207,17 @@ At this time point (June 2025) I don't find LLMs 100% useful in medium to large 
 
   <Citation id="aider">
     <a href="https://github.com/Aider-AI/aider"><em>Aider – AI Pair Programming</em></a>
+  </Citation>
+
+  <Citation id="expressDocs">
+    <a href="https://expressjs.com/"><em>Express.js Documentation</em></a>
+  </Citation>
+
+  <Citation id="astroDocs">
+    <a href="https://astro.build/"><em>Astro Documentation</em></a>
+  </Citation>
+
+  <Citation id="vueDocs">
+    <a href="https://vuejs.org/"><em>Vue.js Documentation</em></a>
   </Citation>
 </References>
