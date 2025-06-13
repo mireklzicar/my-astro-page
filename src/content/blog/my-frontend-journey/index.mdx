@@ -1,0 +1,148 @@
+---
+
+title: "From Backend to Front-End: My Journey to React"
+summary: "How I went from building Python APIs to polishing user experiences with React, Vite and Tailwind."
+date: "June 13 2025"
+draft: true
+category: tech
+tags:
+- React
+- Frontend
+- Typescript
+- CHEESE
+thumbnail: grid.jpg
+toc: true
+---
+
+
+When I wrote my first line of code as a kid, it was probably some script to selfhost a Minecraft server, program for LEGO robot written in C, linux bash script, or a Java code in Processing. Later, I remember relieying heavily on Python with Jupyter Notebooks for data analysis. Web or frontend? I wasn't interested in it at all: it felt so boring.
+
+In my first fullstack job I did program in Flask and used Jinja templates and Bootstrap – it worked up to some point. Then in other projects I used usually a combination of Streamlit, Dash and Flask. Most of the time, i used a minimal friction setup, crafting frontend mostly out of necessity, not because i'd like it. Last year I tried to skim through some React basics and soon fell in love. Now I can consider myself a profficient frontend vibe-coder. Before outsourcing frontend to someone more experienced, I want to enjoy it for a while: even for an amateur, it feels so satisfactory.
+
+![](grid.jpg)
+---
+
+## Stack I use at Deep MedChem
+
+Today every app in our lineup is a story of the right tool at the right time:
+
+| Product            | Stack                                            |
+| ------------------ | ------------------------------------------------ |
+| **CHEESE**         | React + TypeScript + Vite + Tailwind |
+| **Explorer**       | Flask + Python + Dash + HTML         |
+| **Modeller**       | Streamlit + Python                   |
+| **Electrostatics** | Streamlit + Python                   |
+
+
+## 2018‑2020 Data Pipes First, Interfaces Later
+
+Backend life was comfortable.
+
+* **Flask** & **FastAPI** for services
+* Pandas for crunching SAR tables
+* Zero lines of CSS 🥳
+
+If a scientist needed a UI, I’d slap together Jinja templates or pass the job to a front‑end contractor.
+
+## 2021 Streamlit & Dash—The Python UI Training Wheels
+
+The pandemic nudged every tool into the browser, and suddenly “just throw a chart into a notebook” wasn’t enough.
+
+Enter **Streamlit** and **Dash**—Python‑first frameworks that let me stay in my comfort zone while shipping something that *looked* like a web app.
+
+```python
+import streamlit as st
+st.title("Electrostatics Playground")
+st.sidebar.slider("pH", 0.0, 14.0, 7.4)
+```
+
+It was magical… until it wasn’t: custom layouts, auth, and performance hit walls quickly.
+
+## 2022 Explorer: Flask + Dash, My First Franken‑UI
+
+I bolted **Dash** components onto a legacy Flask codebase for our *Explorer* tool.  It worked, but every new widget felt like pushing a square peg through a round router.
+
+Lessons:
+
+1. Python UIs excel at prototypes but chafe at polish.
+2. Designers glare when you can’t implement their Figma shadows.
+
+## 2023 The Friction Became the Feature Flag
+
+Feature velocity slowed.  I caught myself spending evenings reading React docs “just in case.” The TypeScript playground felt oddly like static typing in my old C++ days—comforting!
+
+## 2024 React Epiphany & the CHEESE Project
+
+Deep MedChem’s internal code‑name **CHEESE** needed:
+
+* snappy interactions
+* offline mode
+* a shared component library
+
+Python couldn’t give me that, so I dove into:
+
+* **React 18** with hooks
+* **TypeScript** for safety nets
+* **Vite** for instant HMR
+* **Tailwind CSS** for utility‑first styling
+* **shadcn/ui** for accessible components
+
+The first commit felt like writing a novel with autocorrect enabled.  My 300‑line Dash callback became a 30‑line React component.  Yes, I wrote more boilerplate, but I **owned** the pixels.
+
+```tsx
+// src/components/BigButton.tsx
+import { ButtonHTMLAttributes, PropsWithChildren } from "react";
+
+export function BigButton({ children, ...props }: PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement>>) {
+  return (
+    <button
+      className="rounded-2xl px-4 py-2 shadow-md bg-primary-600 hover:bg-primary-500 transition"
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+```
+
+## 2025 Full Portfolio, Full Control
+
+Today every app in our lineup is a story of the right tool at the right time:
+
+| Product            | Stack                                            |
+| ------------------ | ------------------------------------------------ |
+| **CHEESE**         | React + TypeScript + Vite + Tailwind + shadcn‑ui |
+| **Modeller**       | Streamlit                                        |
+| **Explorer**       | Flask + Dash                                     |
+| **Electrostatics** | Streamlit                                        |
+
+Owning the front‑end lets me ship features without the “handoff tax,” but it also means caring about CLS, bundle sizes, and the whims of npm.  I wouldn’t trade it.
+
+---
+
+## Why I’m Sticking With React/TypeScript—for Now
+
+1. **Type Safety Saves Days** Refactors are click‑rename‑go.
+2. **Ecosystem Gravity** If you can imagine it, there’s an npm package (and probably three blog posts) for it.
+3. **Composable UI** Design tokens + Tailwind = instant consistency.
+
+### Caveats
+
+* The learning curve is real—expect a month of webpack errors (even with Vite).
+* Tooling churn means last year’s tutorial is *vintage*.
+
+## Lessons Learned
+
+* **Start simple, then specialise.** Streamlit is unbeatable for prototypes; React shines for products.
+* **Invest in DX early.** ESLint, Prettier, and Husky pay back instantly.
+* **Design systems matter.** shadcn/ui + Tailwind gave us a shared visual language.
+
+## What’s Next
+
+* Consolidate our disparate UIs into a unified component library.
+* Experiment with **Server Components** and **React 18 suspense**.
+* Keep an eye on **SolidJS** and **HTMX**—because tech 🤹‍♂️.
+
+---
+
+I’m still a backend engineer at heart, but these days my *favorite* endpoint returns `<div>` not JSON.  If my journey helps another scientist‑turned‑coder cross the UI chasm, mission accomplished.
