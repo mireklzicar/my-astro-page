@@ -111,7 +111,7 @@ Since some of the apps I did contained complex plots or interactive data visuali
 
 The integration problem becomes clear when you consider the technical constraints: Plotly.js alone is ~3MB minified, and Dash adds another ~2MB of dependencies. When you try to embed these into a React app, you're looking at 5+ MB just for charting—before your actual application code. This severely impacts page load times, especially on mobile networks. Additionally, Dash's callback system conflicts with React's state management, leading to unpredictable re-renders and memory leaks.
 
-For CHEESE Search, I initially tried embedding Plotly charts directly into the React interface for molecular similarity visualizations. The bundle size ballooned to 8MB, and the molecular drawing interface (Ketcher) started glitching due to conflicting event handlers. The solution was to deploy our 3D molecular viewers as separate Dash applications and embed them as iframes, keeping the main React app lightweight while preserving the interactive functionality.
+For CHEESE Search, I initially tried embedding Ketcher (a molecular drawing component) directly into the main React interface. The bundle size ballooned to 20+ MB, and the molecular drawing interface (Ketcher) was sometimes glitching due to conflicting event handlers. The solution was to deploy it separately and embed it as an iframe, keeping the main React app lightweight while preserving the interactive functionality.
 
 ![](explorer.png)
 *Example: [Explorer](https://explorer.deepmedchem.com) An app for interactive visualisation written in Dash. Supports fancy interactive plots in 2D as well as 3D.*
