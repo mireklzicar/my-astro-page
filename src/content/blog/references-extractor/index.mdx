@@ -1,6 +1,6 @@
 ---
-title: "DOI Reference Extractor: Simplify Your Literature Review"
-summary: "A simple web tool that extracts all references from any academic paper using just a DOI, saving researchers valuable time during literature reviews by eliminating manual citation work."
+title: "DOI Reference Extractor: Open-Source Tool for Effortless Literature Reviews"
+summary: "An open-source React application that extracts all references from academic papers using DOI, converts them to 5000+ citation formats, and enables bulk downloads. Built with OpenCitations API and modern web technologies."
 date: "Jun 22 2025"
 draft: false
 category: tech
@@ -11,14 +11,18 @@ tags:
 - Citations
 - Academic Tools
 - Literature Review
+- Open Source
+- React
+- TypeScript
 thumbnail: references.png
 demoUrl: https://references.mireklzicar.com/
+githubUrl: https://github.com/mireklzicar/doi-reference-extractor
 toc: true
 ---
 
 Academic research often involves navigating through a labyrinth of references and citations. While exploring papers, I found myself spending more time copying references than engaging with the actual ideas. This repetitive task was stealing valuable time that could be better spent on critical thinking and analysis.
 
-I built **DOI Reference Extractor** — a simple yet powerful tool that instantly pulls every reference from an academic paper using just its DOI, allowing you to export citations in multiple formats with a single click.
+I built **DOI Reference Extractor** — an **open-source** tool that instantly pulls every reference from an academic paper using just its DOI, converts them to over 5000 different citation formats, and enables bulk downloads as individual files or ZIP archives.
 
 ## Live Demo
 
@@ -48,56 +52,302 @@ Try the reference extractor below or visit [references.mireklzicar.com](https://
 
 *Live DOI Reference Extractor running at [references.mireklzicar.com](https://references.mireklzicar.com)*
 
+## Features & Capabilities
+
+The tool offers comprehensive reference extraction and formatting capabilities:
+
+### Reference Formats
+- **BibTeX** - Perfect for LaTeX documents and academic writing
+- **RIS** - Compatible with EndNote, Mendeley, Zotero, and other reference managers
+- **EndNote** - Direct EndNote format support
+- **RefWorks** - RefWorks native format
+- **CSL JSON** - Citation Style Language JSON for advanced processing
+- **RDF XML** - Resource Description Framework XML
+- **Turtle RDF** - Turtle RDF serialization format
+
+### Citation Styles
+Choose from over **5000 citation styles** including:
+- **APA** - American Psychological Association
+- **Harvard** - Harvard referencing system
+- **Vancouver** - Vancouver medical citation style
+- **IEEE** - Institute of Electrical and Electronics Engineers
+- **Chicago** - Chicago Manual of Style
+- **MLA** - Modern Language Association
+- **Nature** - Nature journal style
+- And thousands more from the CSL community
+
+### Download Options
+- **Single File** - All references combined in one text file
+- **ZIP Archive** - Individual files for each reference with descriptive filenames
+- **Copy to Clipboard** - Quick copying for immediate use
+- **Share Links** - URL sharing with pre-filled DOIs
+
 ## How It Works
 
-### Simple 2-Step Process
+### Technical Architecture
 
-1. **Enter a DOI** - Just paste any valid Digital Object Identifier (DOI) and press Enter
-2. **Get All References** - The tool instantly retrieves every reference cited in the paper
+The DOI Reference Extractor leverages a sophisticated three-step process using multiple academic APIs:
 
-### Multiple Export Formats
+#### 1. Reference Discovery
+```typescript
+// Step 1: Extract all referenced DOIs from a paper
+const response = await fetch(`https://opencitations.net/index/api/v2/references/${doi}`);
+const references = await response.json();
+```
 
-Export the references in your format of choice:
-- **BibTeX** for LaTeX users
-- **RIS** for EndNote, Mendeley, and other reference managers
-- **APA**, **ACS**, **MLA** formats for direct citation in papers
-- And more common citation styles
+The application queries the **OpenCitations API v2** to retrieve all references cited by the input paper. OpenCitations maintains a comprehensive database of scholarly citations, making it the perfect starting point for reference extraction.
 
-## Why I Built This
+#### 2. Metadata Retrieval
+```typescript
+// Step 2: Fetch detailed metadata for each reference
+const metadataResponse = await fetch(`https://doi.org/${referenceDoi}`, {
+  headers: {
+    'Accept': 'application/json' // or other format
+  }
+});
+```
+
+For each discovered reference DOI, the tool uses **DOI Content Negotiation** provided by Crossref to fetch comprehensive metadata including:
+- Paper titles and abstracts
+- Author names and affiliations
+- Publication dates and venues
+- Publisher information
+- Citation counts and metrics
+
+#### 3. Format Conversion
+```typescript
+// Step 3: Convert to desired citation format
+const citationResponse = await fetch(`https://doi.org/${referenceDoi}`, {
+  headers: {
+    'Accept': 'text/x-bibliography; style=apa' // or other CSL style
+  }
+});
+```
+
+The final step leverages DOI Content Negotiation's support for **Citation Style Language (CSL)** to convert each reference into the user's chosen format or style.
+
+### API Integration Details
+
+The application integrates with three key services:
+
+1. **[OpenCitations API](https://opencitations.net/index/api/v2)**
+   - Provides comprehensive citation indexing
+   - Returns DOIs of all papers referenced by the input DOI
+   - Offers citation metadata and relationship mapping
+
+2. **[DOI Content Negotiation](https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/)**
+   - Crossref's API for metadata retrieval and format conversion
+   - Supports multiple output formats (BibTeX, RIS, CSL JSON, etc.)
+   - Implements Citation Style Language for text formatting
+
+3. **Citation Style Language (CSL)**
+   - Community-maintained repository of 5000+ citation styles
+   - Standardized formatting for academic citations
+   - Support for journal-specific requirements
+
+## Tech Stack & Implementation
+
+The application is built with modern web technologies for optimal performance and user experience:
+
+```json
+{
+  "framework": "React 19 with TypeScript",
+  "build_tool": "Vite",
+  "styling": "Tailwind CSS + ShadCN UI",
+  "api_client": "Axios",
+  "file_processing": "JSZip",
+  "routing": "React Router",
+  "deployment": "Docker + Vercel"
+}
+```
+
+### Key Technical Features
+
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
+- **Error Handling** - Graceful handling of invalid DOIs and API failures
+- **Progress Tracking** - Real-time progress indicators for large reference sets
+- **Batch Processing** - Efficient handling of papers with hundreds of references
+- **Caching Strategy** - Optimized API calls to reduce redundant requests
+
+### Docker Deployment
+
+The application includes production-ready Docker configuration:
+
+```dockerfile
+FROM node:18-alpine as builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+This enables easy deployment across different environments and cloud providers.
+
+## Why I Built This & Open Source Philosophy
 
 During a recent literature review, I realized I was spending more time on the mechanical task of copying citations than on analyzing and connecting ideas. What started as a simple evening project to solve my own problem quickly became a tool others found useful too.
 
+**I believe academic tools should be open and accessible to everyone.** That's why DOI Reference Extractor is completely **open-source** under the Apache 2.0 license. The entire codebase, including documentation and deployment scripts, is available on [GitHub](https://github.com/mireklzicar/doi-reference-extractor).
+
+### Benefits for Researchers
+
 The DOI Reference Extractor eliminates this busywork, allowing researchers to:
-- **Save time** by instantly capturing all references
-- **Follow citation trails** efficiently
-- **Standardize references** across papers
-- **Focus on ideas** rather than formatting
+- **Save time** by instantly capturing all references from any paper
+- **Follow citation trails** efficiently across research domains
+- **Standardize references** using consistent formatting
+- **Focus on ideas** rather than mechanical citation work
+- **Collaborate easily** by sharing formatted reference lists
+- **Support reproducibility** through consistent citation practices
 
-## Example Outputs
+### Open Source Advantages
 
-### Sample BibTeX References 
+By making this tool open-source, the research community benefits from:
+- **Transparency** - Full visibility into how references are processed
+- **Customization** - Ability to modify for specific institutional needs
+- **Community contributions** - Improvements and bug fixes from users worldwide
+- **No vendor lock-in** - Complete control and self-hosting options
+- **Academic freedom** - No restrictions or usage limits
 
-For DOI: `10.1103/physrevlett.10.84`, the tool generates these BibTeX citations:
+## Example Usage & Output Formats
+
+### BibTeX Output Example
+
+For DOI: `10.1103/physrevlett.10.84`, the tool generates properly formatted BibTeX citations:
 
 ```bibtex
-@article{Mandel_1961, title={Correlation in the Fluctuating Outputs from Two Square-Law Detectors Illuminated by Light of Any State of Coherence and Polarization}, volume={124}, ISSN={0031-899X}, url={http://dx.doi.org/10.1103/physrev.124.1696}, DOI={10.1103/physrev.124.1696}, number={6}, journal={Physical Review}, publisher={American Physical Society (APS)}, author={Mandel, L. and Wolf, E.}, year={1961}, month=dec, pages={1696–1702} }
+@article{Mandel_1961,
+  title={Correlation in the Fluctuating Outputs from Two Square-Law Detectors Illuminated by Light of Any State of Coherence and Polarization},
+  volume={124},
+  ISSN={0031-899X},
+  url={http://dx.doi.org/10.1103/physrev.124.1696},
+  DOI={10.1103/physrev.124.1696},
+  number={6},
+  journal={Physical Review},
+  publisher={American Physical Society (APS)},
+  author={Mandel, L. and Wolf, E.},
+  year={1961},
+  month=dec,
+  pages={1696–1702}
+}
+
+@article{BROWN_1956,
+  title={Correlation between Photons in two Coherent Beams of Light},
+  volume={177},
+  ISSN={1476-4687},
+  url={http://dx.doi.org/10.1038/177027a0},
+  DOI={10.1038/177027a0},
+  number={4497},
+  journal={Nature},
+  publisher={Springer Science and Business Media LLC},
+  author={BROWN, R. HANBURY and TWISS, R. Q.},
+  year={1956},
+  month=jan,
+  pages={27–29}
+}
 ```
 
-```bibtex
-@article{Mandel_1959, title={Fluctuations of Photon Beams: The Distribution of the Photo-Electrons}, volume={74}, ISSN={0370-1328}, url={http://dx.doi.org/10.1088/0370-1328/74/3/301}, DOI={10.1088/0370-1328/74/3/301}, number={3}, journal={Proceedings of the Physical Society}, publisher={IOP Publishing}, author={Mandel, L}, year={1959}, month=sep, pages={233–243} }
+### RIS Format Example
+
+The same references in RIS format for EndNote/Mendeley:
+
+```ris
+TY  - JOUR
+AU  - Mandel, L.
+AU  - Wolf, E.
+TI  - Correlation in the Fluctuating Outputs from Two Square-Law Detectors
+JO  - Physical Review
+VL  - 124
+IS  - 6
+SP  - 1696
+EP  - 1702
+PY  - 1961
+DO  - 10.1103/physrev.124.1696
+ER  -
+
+TY  - JOUR
+AU  - Brown, R. Hanbury
+AU  - Twiss, R. Q.
+TI  - Correlation between Photons in two Coherent Beams of Light
+JO  - Nature
+VL  - 177
+IS  - 4497
+SP  - 27
+EP  - 29
+PY  - 1956
+DO  - 10.1038/177027a0
+ER  -
 ```
 
-```bibtex
-@article{BROWN_1956, title={Correlation between Photons in two Coherent Beams of Light}, volume={177}, ISSN={1476-4687}, url={http://dx.doi.org/10.1038/177027a0}, DOI={10.1038/177027a0}, number={4497}, journal={Nature}, publisher={Springer Science and Business Media LLC}, author={BROWN, R. HANBURY and TWISS, R. Q.}, year={1956}, month=jan, pages={27–29} }
+### APA Citation Style Example
+
+For direct inclusion in manuscripts:
+
+```
+Mandel, L., & Wolf, E. (1961). Correlation in the fluctuating outputs from two square-law detectors illuminated by light of any state of coherence and polarization. Physical Review, 124(6), 1696-1702.
+
+Brown, R. H., & Twiss, R. Q. (1956). Correlation between photons in two coherent beams of light. Nature, 177(4497), 27-29.
 ```
 
-```bibtex
-@article{REBKA_1957, title={Time-Correlated Photons}, volume={180}, ISSN={1476-4687}, url={http://dx.doi.org/10.1038/1801035a0}, DOI={10.1038/1801035a0}, number={4594}, journal={Nature}, publisher={Springer Science and Business Media LLC}, author={REBKA, G. A. and POUND, R. V.}, year={1957}, month=nov, pages={1035–1036} }
+## Getting Started
+
+### Using the Web Application
+
+1. Visit [references.mireklzicar.com](https://references.mireklzicar.com/)
+2. Enter any DOI (e.g., `10.1073/pnas.1118373109`)
+3. Click "Get References" and wait for processing
+4. Select your preferred format or citation style
+5. Download as single file or ZIP archive
+
+### Self-Hosting with Docker
+
+Clone and deploy your own instance:
+
+```bash
+# Clone the repository
+git clone https://github.com/mireklzicar/doi-reference-extractor.git
+cd doi-reference-extractor
+
+# Build and run with Docker
+docker build -t doi-reference-extractor .
+docker run -p 80:80 doi-reference-extractor
+```
+
+### Development Setup
+
+For local development and contributions:
+
+```bash
+# Install dependencies
+npm install
+# or
+pnpm install
+
+# Start development server
+npm run dev
+# or
+pnpm dev
+
+# Build for production
+npm run build
+# or
+pnpm build
 ```
 
 
-## Try It Now
+### Roadmap
 
-Visit [references.mireklzicar.com](https://references.mireklzicar.com/) to start simplifying your research workflow.
+Future enhancements under consideration:
+- **Bulk DOI processing** - Upload lists of DOIs for batch processing
+- **Citation network visualization** - Interactive graphs of citation relationships
+- **Additional APIs** - Integration with PubMed, arXiv, and other databases
+- **Citation analysis** - Impact metrics and citation pattern analysis
+- **Custom style editor** - Create and modify citation styles
 
-By eliminating the tedious busywork of manually copying and formatting references, we can all spend more time where it matters - engaging with ideas and advancing knowledge.
+By eliminating the tedious busywork of manually copying and formatting references, we can all spend more time where it matters - engaging with ideas and advancing knowledge. **Try it now at [references.mireklzicar.com](https://references.mireklzicar.com/) and join the open-source research community!**
